@@ -108,7 +108,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed quarto-light">
+<body class="nav-fixed fullcontent quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -151,29 +151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#sagui" id="toc-sagui" class="nav-link active" data-scroll-target="#sagui">sagui <img align="right" src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" width="240"></a>
-  <ul class="collapse">
-  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
-  <li><a href="#core-workflow" id="toc-core-workflow" class="nav-link" data-scroll-target="#core-workflow">Core Workflow</a></li>
-  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
-  <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a>
-  <ul class="collapse">
-  <li><a href="#segment-an-ifu-cube" id="toc-segment-an-ifu-cube" class="nav-link" data-scroll-target="#segment-an-ifu-cube">Segment an IFU Cube</a></li>
-  <li><a href="#extract-integrated-seds" id="toc-extract-integrated-seds" class="nav-link" data-scroll-target="#extract-integrated-seds">Extract Integrated SEDs</a></li>
-  <li><a href="#plot-a-region-property" id="toc-plot-a-region-property" class="nav-link" data-scroll-target="#plot-a-region-property">Plot a Region Property</a></li>
-  </ul></li>
-  <li><a href="#package-logic" id="toc-package-logic" class="nav-link" data-scroll-target="#package-logic">Package Logic</a></li>
-  <li><a href="#dependencies" id="toc-dependencies" class="nav-link" data-scroll-target="#dependencies">Dependencies</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
-  </ul></li>
-  </ul>
-</nav>
-    </div>
+    
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -196,9 +174,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="sagui" class="level1">
-<h1>sagui <img align="right" src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" width="240"></h1>
 <p><a href="https://github.com/RafaelSdeSouza/sagui"><img src="https://img.shields.io/badge/GitHub-sagui-0f4c5c?logo=github.png" class="img-fluid" alt="GitHub"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0f4c5c.png" class="img-fluid" alt="License"></a> <a href="https://github.com/COINtoolbox"><img src="https://img.shields.io/badge/COIN-Toolbox-c89b3c.png" class="img-fluid" alt="COIN"></a></p>
+<div class="quarto-figure quarto-figure-right">
+<figure class="figure">
+<p><img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" class="img-fluid quarto-figure quarto-figure-right figure-img" width="340"></p>
+</figure>
+</div>
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p><strong>sagui</strong> is a photometric SED-based segmentation package for IFU data cubes. It is designed to identify spatial regions using a photometric representation of the cube, apply a starlet-based mask, cluster valid spaxels into regions, and extract integrated SEDs with propagated uncertainties for each region.</p>
@@ -313,7 +294,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

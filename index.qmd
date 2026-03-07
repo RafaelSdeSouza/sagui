@@ -2,11 +2,11 @@
 title: "sagui"
 ---
 
-# sagui <img align="right" src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" width="240">
-
 [![GitHub](https://img.shields.io/badge/GitHub-sagui-0f4c5c?logo=github)](https://github.com/RafaelSdeSouza/sagui)
 [![License](https://img.shields.io/badge/license-MIT-0f4c5c)](LICENSE)
 [![COIN](https://img.shields.io/badge/COIN-Toolbox-c89b3c)](https://github.com/COINtoolbox)
+
+![](https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg){fig-align="right" width="340"}
 
 ## Overview
 

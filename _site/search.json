@@ -28,59 +28,52 @@
     "text": "Design Principles\n\nconcise public API\nrobust defaults for real IFU cubes\nclear separation between segmentation and region-level summaries\noptional acceleration without forcing heavyweight dependencies"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "sagui",
-    "section": "",
-    "text": "sagui is a photometric SED-based segmentation package for IFU data cubes. It is designed to identify spatial regions using a photometric representation of the cube, apply a starlet-based mask, cluster valid spaxels into regions, and extract integrated SEDs with propagated uncertainties for each region.\nIn contrast to a purely spectral segmentation workflow, sagui is centered on:\n\nphotometric preconditioning of the cube\nmultiscale masking through starlet reconstruction\nsegmentation of valid regions\nintegrated region SEDs and uncertainties\nregion-level property maps for downstream SED fitting\n\n\nPart of the COIN Toolbox, with a focus on concise, community-oriented tools for astronomical data analysis.\n\n\n\n\nThe intended workflow is:\n\ncollapse the IFU cube into a photometric summary image\nbuild a starlet mask from the collapsed image\nsegment the masked cube into regions\nextract integrated SEDs and uncertainties for each region\nproject derived region properties back onto the image plane\n\nThe main user-facing functions are:\n\nsegment_regions()\nbuild_starlet_mask()\nextract_region_sed()\nsummarize_region_sed()\nplot_region_map()\nplot_region_property_map()\nplot_region_property_raster()\n\n\n\n\nInstall from GitHub:\ninstall.packages(\"remotes\")\nremotes::install_github(\"RafaelSdeSouza/sagui\")\nlibrary(sagui)\nIf you want the faster clustering backend, also install the optional acceleration packages:\ninstall.packages(\"fastcluster\")\ninstall.packages(\"torch\")\n\n\n\n\n\nsuppressPackageStartupMessages({\n  library(sagui)\n  library(FITSio)\n})\n\nx &lt;- FITSio::readFITS(\"manga-8135-12701-LOGCUBE.fits\")\n\nseg &lt;- segment_regions(\n  input = x,\n  Ncomp = 30,\n  use_starlet_mask = TRUE,\n  starlet_J = 5,\n  starlet_scales = 2:5\n)\n\nplot_region_map(seg, palette = \"magma\")\n\n\n\nsed &lt;- extract_region_sed(\n  cube = x,\n  labels = seg$cluster_map,\n  band_values = FITSio::axVec(3, x$axDat)\n)\n\nhead(sed$flux_long)\n\n\n\nplot_region_property_map(\n  seg,\n  values = setNames(sed$flux_wide$n_pix, sed$flux_wide$region),\n  value_label = \"Pixels per region\"\n)\n\n\n\n\nThe segmentation stage and the SED summary stage are intentionally separated:\n\nclustering operates on scaled per-spaxel vectors\nregion summaries are based on integrated SEDs, not median representative spectra\n\nThis makes sagui better aligned with workflows where the final product is a region-integrated SED plus uncertainty for fitting or physical interpretation.\n\n\n\n\nFITSio for FITS cube handling\ndplyr, tidyr, tibble for table reshaping\nggplot2, viridis, sf for visualization\nmatrixStats and Matrix for efficient numerical operations\nfastcluster and torch as optional clustering accelerators\n\n\n\n\n\nBundy, Kevin, et al. (2015). Overview of the SDSS-IV MaNGA Survey: Mapping Nearby Galaxies at Apache Point Observatory. The Astrophysical Journal, 798(1), 7. https://doi.org/10.1088/0004-637X/798/1/7\nde Souza, R. S., et al. (2025). CAPIVARA: A spectral-based segmentation method for IFU data cubes. Monthly Notices of the Royal Astronomical Society, 539(4), 3166-3179. https://doi.org/10.1093/mnras/staf688\nStarck, J.-L., Murtagh, F., and Fadili, J. (2015). Sparse Image and Signal Processing: Wavelets, Curvelets, Morphological Diversity. Cambridge University Press."
-  },
-  {
     "objectID": "index.html#overview",
     "href": "index.html#overview",
     "title": "sagui",
-    "section": "",
-    "text": "sagui is a photometric SED-based segmentation package for IFU data cubes. It is designed to identify spatial regions using a photometric representation of the cube, apply a starlet-based mask, cluster valid spaxels into regions, and extract integrated SEDs with propagated uncertainties for each region.\nIn contrast to a purely spectral segmentation workflow, sagui is centered on:\n\nphotometric preconditioning of the cube\nmultiscale masking through starlet reconstruction\nsegmentation of valid regions\nintegrated region SEDs and uncertainties\nregion-level property maps for downstream SED fitting\n\n\nPart of the COIN Toolbox, with a focus on concise, community-oriented tools for astronomical data analysis."
+    "section": "Overview",
+    "text": "Overview\nsagui is a photometric SED-based segmentation package for IFU data cubes. It is designed to identify spatial regions using a photometric representation of the cube, apply a starlet-based mask, cluster valid spaxels into regions, and extract integrated SEDs with propagated uncertainties for each region.\nIn contrast to a purely spectral segmentation workflow, sagui is centered on:\n\nphotometric preconditioning of the cube\nmultiscale masking through starlet reconstruction\nsegmentation of valid regions\nintegrated region SEDs and uncertainties\nregion-level property maps for downstream SED fitting\n\n\nPart of the COIN Toolbox, with a focus on concise, community-oriented tools for astronomical data analysis."
   },
   {
     "objectID": "index.html#core-workflow",
     "href": "index.html#core-workflow",
     "title": "sagui",
-    "section": "",
-    "text": "The intended workflow is:\n\ncollapse the IFU cube into a photometric summary image\nbuild a starlet mask from the collapsed image\nsegment the masked cube into regions\nextract integrated SEDs and uncertainties for each region\nproject derived region properties back onto the image plane\n\nThe main user-facing functions are:\n\nsegment_regions()\nbuild_starlet_mask()\nextract_region_sed()\nsummarize_region_sed()\nplot_region_map()\nplot_region_property_map()\nplot_region_property_raster()"
+    "section": "Core Workflow",
+    "text": "Core Workflow\nThe intended workflow is:\n\ncollapse the IFU cube into a photometric summary image\nbuild a starlet mask from the collapsed image\nsegment the masked cube into regions\nextract integrated SEDs and uncertainties for each region\nproject derived region properties back onto the image plane\n\nThe main user-facing functions are:\n\nsegment_regions()\nbuild_starlet_mask()\nextract_region_sed()\nsummarize_region_sed()\nplot_region_map()\nplot_region_property_map()\nplot_region_property_raster()"
   },
   {
     "objectID": "index.html#installation",
     "href": "index.html#installation",
     "title": "sagui",
-    "section": "",
-    "text": "Install from GitHub:\ninstall.packages(\"remotes\")\nremotes::install_github(\"RafaelSdeSouza/sagui\")\nlibrary(sagui)\nIf you want the faster clustering backend, also install the optional acceleration packages:\ninstall.packages(\"fastcluster\")\ninstall.packages(\"torch\")"
+    "section": "Installation",
+    "text": "Installation\nInstall from GitHub:\ninstall.packages(\"remotes\")\nremotes::install_github(\"RafaelSdeSouza/sagui\")\nlibrary(sagui)\nIf you want the faster clustering backend, also install the optional acceleration packages:\ninstall.packages(\"fastcluster\")\ninstall.packages(\"torch\")"
   },
   {
     "objectID": "index.html#usage",
     "href": "index.html#usage",
     "title": "sagui",
-    "section": "",
-    "text": "suppressPackageStartupMessages({\n  library(sagui)\n  library(FITSio)\n})\n\nx &lt;- FITSio::readFITS(\"manga-8135-12701-LOGCUBE.fits\")\n\nseg &lt;- segment_regions(\n  input = x,\n  Ncomp = 30,\n  use_starlet_mask = TRUE,\n  starlet_J = 5,\n  starlet_scales = 2:5\n)\n\nplot_region_map(seg, palette = \"magma\")\n\n\n\nsed &lt;- extract_region_sed(\n  cube = x,\n  labels = seg$cluster_map,\n  band_values = FITSio::axVec(3, x$axDat)\n)\n\nhead(sed$flux_long)\n\n\n\nplot_region_property_map(\n  seg,\n  values = setNames(sed$flux_wide$n_pix, sed$flux_wide$region),\n  value_label = \"Pixels per region\"\n)"
+    "section": "Usage",
+    "text": "Usage\n\nSegment an IFU Cube\nsuppressPackageStartupMessages({\n  library(sagui)\n  library(FITSio)\n})\n\nx &lt;- FITSio::readFITS(\"manga-8135-12701-LOGCUBE.fits\")\n\nseg &lt;- segment_regions(\n  input = x,\n  Ncomp = 30,\n  use_starlet_mask = TRUE,\n  starlet_J = 5,\n  starlet_scales = 2:5\n)\n\nplot_region_map(seg, palette = \"magma\")\n\n\nExtract Integrated SEDs\nsed &lt;- extract_region_sed(\n  cube = x,\n  labels = seg$cluster_map,\n  band_values = FITSio::axVec(3, x$axDat)\n)\n\nhead(sed$flux_long)\n\n\nPlot a Region Property\nplot_region_property_map(\n  seg,\n  values = setNames(sed$flux_wide$n_pix, sed$flux_wide$region),\n  value_label = \"Pixels per region\"\n)"
   },
   {
     "objectID": "index.html#package-logic",
     "href": "index.html#package-logic",
     "title": "sagui",
-    "section": "",
-    "text": "The segmentation stage and the SED summary stage are intentionally separated:\n\nclustering operates on scaled per-spaxel vectors\nregion summaries are based on integrated SEDs, not median representative spectra\n\nThis makes sagui better aligned with workflows where the final product is a region-integrated SED plus uncertainty for fitting or physical interpretation."
+    "section": "Package Logic",
+    "text": "Package Logic\nThe segmentation stage and the SED summary stage are intentionally separated:\n\nclustering operates on scaled per-spaxel vectors\nregion summaries are based on integrated SEDs, not median representative spectra\n\nThis makes sagui better aligned with workflows where the final product is a region-integrated SED plus uncertainty for fitting or physical interpretation."
   },
   {
     "objectID": "index.html#dependencies",
     "href": "index.html#dependencies",
     "title": "sagui",
-    "section": "",
-    "text": "FITSio for FITS cube handling\ndplyr, tidyr, tibble for table reshaping\nggplot2, viridis, sf for visualization\nmatrixStats and Matrix for efficient numerical operations\nfastcluster and torch as optional clustering accelerators"
+    "section": "Dependencies",
+    "text": "Dependencies\n\nFITSio for FITS cube handling\ndplyr, tidyr, tibble for table reshaping\nggplot2, viridis, sf for visualization\nmatrixStats and Matrix for efficient numerical operations\nfastcluster and torch as optional clustering accelerators"
   },
   {
     "objectID": "index.html#references",
     "href": "index.html#references",
     "title": "sagui",
-    "section": "",
-    "text": "Bundy, Kevin, et al. (2015). Overview of the SDSS-IV MaNGA Survey: Mapping Nearby Galaxies at Apache Point Observatory. The Astrophysical Journal, 798(1), 7. https://doi.org/10.1088/0004-637X/798/1/7\nde Souza, R. S., et al. (2025). CAPIVARA: A spectral-based segmentation method for IFU data cubes. Monthly Notices of the Royal Astronomical Society, 539(4), 3166-3179. https://doi.org/10.1093/mnras/staf688\nStarck, J.-L., Murtagh, F., and Fadili, J. (2015). Sparse Image and Signal Processing: Wavelets, Curvelets, Morphological Diversity. Cambridge University Press."
+    "section": "References",
+    "text": "References\n\nBundy, Kevin, et al. (2015). Overview of the SDSS-IV MaNGA Survey: Mapping Nearby Galaxies at Apache Point Observatory. The Astrophysical Journal, 798(1), 7. https://doi.org/10.1088/0004-637X/798/1/7\nde Souza, R. S., et al. (2025). CAPIVARA: A spectral-based segmentation method for IFU data cubes. Monthly Notices of the Royal Astronomical Society, 539(4), 3166-3179. https://doi.org/10.1093/mnras/staf688\nStarck, J.-L., Murtagh, F., and Fadili, J. (2015). Sparse Image and Signal Processing: Wavelets, Curvelets, Morphological Diversity. Cambridge University Press."
   }
 ]

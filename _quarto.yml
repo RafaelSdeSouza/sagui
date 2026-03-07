@@ -21,4 +21,4 @@ format:
   html:
     theme: cosmo
     css: styles.css
-    toc: true
+    toc: false
