@@ -1,14 +1,12 @@
 ---
-title: "sagui"
+title: ""
 ---
+
+<h1 class="hero-title">sagui <img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" width="120" alt="COIN logo"></h1>
 
 [![GitHub](https://img.shields.io/badge/GitHub-sagui-0f4c5c?logo=github)](https://github.com/RafaelSdeSouza/sagui)
 [![License](https://img.shields.io/badge/license-MIT-0f4c5c)](LICENSE)
 [![COIN](https://img.shields.io/badge/COIN-Toolbox-c89b3c)](https://github.com/COINtoolbox)
-
-<div style="float: right; margin: -1.2rem 0 0.8rem 1.2rem;">
-  <img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" width="180" alt="COIN logo">
-</div>
 
 ## Overview
 

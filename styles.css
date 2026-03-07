@@ -27,6 +27,21 @@ body {
   letter-spacing: 0.02em;
 }
 
+.hero-title {
+  color: var(--coin-navy);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero-title img {
+  display: inline-block;
+  opacity: 0.9;
+}
+
 h1, h2, h3 {
   color: var(--coin-navy);
 }
