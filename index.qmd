@@ -4,64 +4,53 @@ title: ""
 
 <h1 class="hero-title">sagui <img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" width="120" alt="COIN logo"></h1>
 
-[![GitHub](https://img.shields.io/badge/GitHub-sagui-0f4c5c?logo=github)](https://github.com/RafaelSdeSouza/sagui)
-[![License](https://img.shields.io/badge/license-MIT-0f4c5c)](LICENSE)
-[![COIN](https://img.shields.io/badge/COIN-Toolbox-c89b3c)](https://github.com/COINtoolbox)
+<div class="hero-copy">
+Photometric SED-based segmentation for IFU data cubes.
+</div>
 
-## Overview
+<div class="hero-actions">
+  <a class="hero-button hero-button-primary" href="#installation">Install</a>
+  <a class="hero-button" href="#quick-start">Quick Start</a>
+  <a class="hero-button" href="https://github.com/RafaelSdeSouza/sagui">GitHub</a>
+</div>
 
-**sagui** is a photometric SED-based segmentation package for IFU data cubes. It is designed to identify spatial regions using a photometric representation of the cube, apply a starlet-based mask, cluster valid spaxels into regions, and extract integrated SEDs with propagated uncertainties for each region.
+<div class="hero-note">
+Part of the <strong>COIN Toolbox</strong>, focused on concise and reusable methods for astronomical data analysis.
+</div>
 
-In contrast to a purely spectral segmentation workflow, **sagui** is centered on:
+## What It Does
 
-- photometric preconditioning of the cube
-- multiscale masking through starlet reconstruction
-- segmentation of valid regions
-- integrated region SEDs and uncertainties
-- region-level property maps for downstream SED fitting
+**sagui** combines photometric preprocessing and region-based SED extraction in one workflow:
 
-> Part of the **COIN Toolbox**, with a focus on concise, community-oriented tools for astronomical data analysis.
+- build a white-light representation of an IFU cube
+- derive a starlet-based photometric mask
+- cluster valid spaxels into regions
+- extract integrated SEDs and propagated uncertainties
+- project region properties back onto the image plane
 
-## Core Workflow
+## Core Ideas
 
-The intended workflow is:
+::: {.grid}
+::: {.g-col-12 .g-col-md-4}
+### Photometric Masking
 
-1. collapse the IFU cube into a photometric summary image
-2. build a starlet mask from the collapsed image
-3. segment the masked cube into regions
-4. extract integrated SEDs and uncertainties for each region
-5. project derived region properties back onto the image plane
+Collapse the cube, reconstruct selected starlet scales, and isolate spatially meaningful regions before clustering.
+:::
 
-The main user-facing functions are:
+::: {.g-col-12 .g-col-md-4}
+### Region Segmentation
 
-- `segment_regions()`
-- `build_starlet_mask()`
-- `extract_region_sed()`
-- `summarize_region_sed()`
-- `plot_region_map()`
-- `plot_region_property_map()`
-- `plot_region_property_raster()`
+Segment only the valid spaxels, keeping the clustering logic aligned with the original `capivara` workflow.
+:::
 
-## Installation
+::: {.g-col-12 .g-col-md-4}
+### Integrated Region SEDs
 
-Install from GitHub:
+Summarize each region as an integrated SED with uncertainty propagation rather than a representative median spectrum.
+:::
+:::
 
-```r
-install.packages("remotes")
-remotes::install_github("RafaelSdeSouza/sagui")
-library(sagui)
-```
-
-If you want the faster clustering backend, also install the optional acceleration packages:
-
-```r
-install.packages("fastcluster")
-install.packages("torch")
-```
-
-## Usage
-
-### Segment an IFU Cube
+## Quick Start
 
 ```r
 suppressPackageStartupMessages({
@@ -82,7 +71,24 @@ seg <- segment_regions(
 plot_region_map(seg, palette = "magma")
 ```
 
-### Extract Integrated SEDs
+## Installation
+
+Install from GitHub:
+
+```r
+install.packages("remotes")
+remotes::install_github("RafaelSdeSouza/sagui")
+library(sagui)
+```
+
+For the faster clustering backend:
+
+```r
+install.packages("fastcluster")
+install.packages("torch")
+```
+
+## Region SEDs
 
 ```r
 sed <- extract_region_sed(
@@ -94,7 +100,7 @@ sed <- extract_region_sed(
 head(sed$flux_long)
 ```
 
-### Plot a Region Property
+## Region Property Maps
 
 ```r
 plot_region_property_map(
@@ -104,22 +110,13 @@ plot_region_property_map(
 )
 ```
 
-## Package Logic
+## Why sagui
 
-The segmentation stage and the SED summary stage are intentionally separated:
+The package is designed for cases where the final object of interest is a **region-integrated SED with uncertainty**, not just a segmented image or a representative median spectrum.
 
 - clustering operates on scaled per-spaxel vectors
-- region summaries are based on integrated SEDs, not median representative spectra
-
-This makes **sagui** better aligned with workflows where the final product is a region-integrated SED plus uncertainty for fitting or physical interpretation.
-
-## Dependencies
-
-- **FITSio** for FITS cube handling
-- **dplyr**, **tidyr**, **tibble** for table reshaping
-- **ggplot2**, **viridis**, **sf** for visualization
-- **matrixStats** and **Matrix** for efficient numerical operations
-- **fastcluster** and **torch** as optional clustering accelerators
+- region summaries are integrated over the segmented regions
+- output is suitable for downstream SED fitting and region-based analysis
 
 ## References
 

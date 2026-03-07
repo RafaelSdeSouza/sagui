@@ -153,102 +153,82 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">sagui</h1>
+
+
+
+<h1 class="hero-title">
+sagui <img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" width="120" alt="COIN logo">
+</h1>
+<div class="hero-copy">
+<p>Photometric SED-based segmentation for IFU data cubes.</p>
 </div>
-
-
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<p><a href="https://github.com/RafaelSdeSouza/sagui"><img src="https://img.shields.io/badge/GitHub-sagui-0f4c5c?logo=github.png" class="img-fluid" alt="GitHub"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0f4c5c.png" class="img-fluid" alt="License"></a> <a href="https://github.com/COINtoolbox"><img src="https://img.shields.io/badge/COIN-Toolbox-c89b3c.png" class="img-fluid" alt="COIN"></a></p>
-<div class="quarto-figure quarto-figure-right">
-<figure class="figure">
-<p><img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" class="img-fluid quarto-figure quarto-figure-right figure-img" width="340"></p>
-</figure>
+<div class="hero-actions">
+<p><a class="hero-button hero-button-primary" href="#installation">Install</a> <a class="hero-button" href="#quick-start">Quick Start</a> <a class="hero-button" href="https://github.com/RafaelSdeSouza/sagui">GitHub</a></p>
 </div>
-<section id="overview" class="level2">
-<h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p><strong>sagui</strong> is a photometric SED-based segmentation package for IFU data cubes. It is designed to identify spatial regions using a photometric representation of the cube, apply a starlet-based mask, cluster valid spaxels into regions, and extract integrated SEDs with propagated uncertainties for each region.</p>
-<p>In contrast to a purely spectral segmentation workflow, <strong>sagui</strong> is centered on:</p>
+<div class="hero-note">
+<p>Part of the <strong>COIN Toolbox</strong>, focused on concise and reusable methods for astronomical data analysis.</p>
+</div>
+<section id="what-it-does" class="level2">
+<h2 class="anchored" data-anchor-id="what-it-does">What It Does</h2>
+<p><strong>sagui</strong> combines photometric preprocessing and region-based SED extraction in one workflow:</p>
 <ul>
-<li>photometric preconditioning of the cube</li>
-<li>multiscale masking through starlet reconstruction</li>
-<li>segmentation of valid regions</li>
-<li>integrated region SEDs and uncertainties</li>
-<li>region-level property maps for downstream SED fitting</li>
+<li>build a white-light representation of an IFU cube</li>
+<li>derive a starlet-based photometric mask</li>
+<li>cluster valid spaxels into regions</li>
+<li>extract integrated SEDs and propagated uncertainties</li>
+<li>project region properties back onto the image plane</li>
 </ul>
-<blockquote class="blockquote">
-<p>Part of the <strong>COIN Toolbox</strong>, with a focus on concise, community-oriented tools for astronomical data analysis.</p>
-</blockquote>
 </section>
-<section id="core-workflow" class="level2">
-<h2 class="anchored" data-anchor-id="core-workflow">Core Workflow</h2>
-<p>The intended workflow is:</p>
-<ol type="1">
-<li>collapse the IFU cube into a photometric summary image</li>
-<li>build a starlet mask from the collapsed image</li>
-<li>segment the masked cube into regions</li>
-<li>extract integrated SEDs and uncertainties for each region</li>
-<li>project derived region properties back onto the image plane</li>
-</ol>
-<p>The main user-facing functions are:</p>
-<ul>
-<li><code>segment_regions()</code></li>
-<li><code>build_starlet_mask()</code></li>
-<li><code>extract_region_sed()</code></li>
-<li><code>summarize_region_sed()</code></li>
-<li><code>plot_region_map()</code></li>
-<li><code>plot_region_property_map()</code></li>
-<li><code>plot_region_property_raster()</code></li>
-</ul>
+<section id="core-ideas" class="level2">
+<h2 class="anchored" data-anchor-id="core-ideas">Core Ideas</h2>
+<div class="grid">
+<section id="photometric-masking" class="level3 g-col-12 g-col-md-4">
+<h3 class="anchored" data-anchor-id="photometric-masking">Photometric Masking</h3>
+<p>Collapse the cube, reconstruct selected starlet scales, and isolate spatially meaningful regions before clustering.</p>
+</section>
+<section id="region-segmentation" class="level3 g-col-12 g-col-md-4">
+<h3 class="anchored" data-anchor-id="region-segmentation">Region Segmentation</h3>
+<p>Segment only the valid spaxels, keeping the clustering logic aligned with the original <code>capivara</code> workflow.</p>
+</section>
+<section id="integrated-region-seds" class="level3 g-col-12 g-col-md-4">
+<h3 class="anchored" data-anchor-id="integrated-region-seds">Integrated Region SEDs</h3>
+<p>Summarize each region as an integrated SED with uncertainty propagation rather than a representative median spectrum.</p>
+</section>
+</div>
+</section>
+<section id="quick-start" class="level2">
+<h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>({</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(sagui)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(FITSio)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> FITSio<span class="sc">::</span><span class="fu">readFITS</span>(<span class="st">"manga-8135-12701-LOGCUBE.fits"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>seg <span class="ot">&lt;-</span> <span class="fu">segment_regions</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">input =</span> x,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Ncomp =</span> <span class="dv">30</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">use_starlet_mask =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">starlet_J =</span> <span class="dv">5</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">starlet_scales =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">5</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_region_map</span>(seg, <span class="at">palette =</span> <span class="st">"magma"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>Install from GitHub:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"remotes"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"RafaelSdeSouza/sagui"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sagui)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>If you want the faster clustering backend, also install the optional acceleration packages:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"fastcluster"</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"torch"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"remotes"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"RafaelSdeSouza/sagui"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sagui)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For the faster clustering backend:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"fastcluster"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"torch"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="usage" class="level2">
-<h2 class="anchored" data-anchor-id="usage">Usage</h2>
-<section id="segment-an-ifu-cube" class="level3">
-<h3 class="anchored" data-anchor-id="segment-an-ifu-cube">Segment an IFU Cube</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>({</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(sagui)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(FITSio)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> FITSio<span class="sc">::</span><span class="fu">readFITS</span>(<span class="st">"manga-8135-12701-LOGCUBE.fits"</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>seg <span class="ot">&lt;-</span> <span class="fu">segment_regions</span>(</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">input =</span> x,</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Ncomp =</span> <span class="dv">30</span>,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">use_starlet_mask =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">starlet_J =</span> <span class="dv">5</span>,</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">starlet_scales =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">5</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_region_map</span>(seg, <span class="at">palette =</span> <span class="st">"magma"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="extract-integrated-seds" class="level3">
-<h3 class="anchored" data-anchor-id="extract-integrated-seds">Extract Integrated SEDs</h3>
+<section id="region-seds" class="level2">
+<h2 class="anchored" data-anchor-id="region-seds">Region SEDs</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sed <span class="ot">&lt;-</span> <span class="fu">extract_region_sed</span>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">cube =</span> x,</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> seg<span class="sc">$</span>cluster_map,</span>
@@ -257,32 +237,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sed<span class="sc">$</span>flux_long)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="plot-a-region-property" class="level3">
-<h3 class="anchored" data-anchor-id="plot-a-region-property">Plot a Region Property</h3>
+<section id="region-property-maps" class="level2">
+<h2 class="anchored" data-anchor-id="region-property-maps">Region Property Maps</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_region_property_map</span>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  seg,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">values =</span> <span class="fu">setNames</span>(sed<span class="sc">$</span>flux_wide<span class="sc">$</span>n_pix, sed<span class="sc">$</span>flux_wide<span class="sc">$</span>region),</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">value_label =</span> <span class="st">"Pixels per region"</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-</section>
-<section id="package-logic" class="level2">
-<h2 class="anchored" data-anchor-id="package-logic">Package Logic</h2>
-<p>The segmentation stage and the SED summary stage are intentionally separated:</p>
+<section id="why-sagui" class="level2">
+<h2 class="anchored" data-anchor-id="why-sagui">Why sagui</h2>
+<p>The package is designed for cases where the final object of interest is a <strong>region-integrated SED with uncertainty</strong>, not just a segmented image or a representative median spectrum.</p>
 <ul>
 <li>clustering operates on scaled per-spaxel vectors</li>
-<li>region summaries are based on integrated SEDs, not median representative spectra</li>
-</ul>
-<p>This makes <strong>sagui</strong> better aligned with workflows where the final product is a region-integrated SED plus uncertainty for fitting or physical interpretation.</p>
-</section>
-<section id="dependencies" class="level2">
-<h2 class="anchored" data-anchor-id="dependencies">Dependencies</h2>
-<ul>
-<li><strong>FITSio</strong> for FITS cube handling</li>
-<li><strong>dplyr</strong>, <strong>tidyr</strong>, <strong>tibble</strong> for table reshaping</li>
-<li><strong>ggplot2</strong>, <strong>viridis</strong>, <strong>sf</strong> for visualization</li>
-<li><strong>matrixStats</strong> and <strong>Matrix</strong> for efficient numerical operations</li>
-<li><strong>fastcluster</strong> and <strong>torch</strong> as optional clustering accelerators</li>
+<li>region summaries are integrated over the segmented regions</li>
+<li>output is suitable for downstream SED fitting and region-based analysis</li>
 </ul>
 </section>
 <section id="references" class="level2">
