@@ -1,0 +1,63 @@
+palette_van_gogh_div <- function(n = 256) {
+  stops <- c(
+    "#80B7FF",  # light muted teal
+    "#547FFF",  # muted teal blue
+    "#405CFF",  # light blue
+    "#263C8B",  # dark blue
+    "#FFFAA3",  # yellow
+    "#FFDE38",  # muted gold
+    "#BFA524"  # deep amber
+  )
+  grDevices::colorRampPalette(stops, space = "Lab")(n)
+}
+
+suppressPackageStartupMessages({
+  library(sagui)
+  library(FITSio)
+})
+
+# Load FITS cube
+x <- FITSio::readFITS("manga-7960-12701-LOGCUBE.fits")
+
+# Run photometric segmentation with an internal starlet mask
+seg <- segment_regions(
+  input = x,
+  n_regions = 50,
+  use_starlet_mask = TRUE,
+  starlet_J = 5,
+  starlet_scales = 2:5,
+  denoise_k = 0,
+  mask_mode = "na"
+)
+
+# Region-level photometry on the resulting segmentation
+phot <- RegionPhotometry(
+  cube = x,
+  labels = seg$cluster_map,
+  band_values = FITSio::axVec(3, x$axDat)
+)
+
+# Plot the segmentation map
+plot_region_map(
+  seg,
+  palette = viridis::inferno(50),
+  border_color = "black",
+  border_linewidth = 1,
+  background_color = "transparent"
+)
+
+# Plot one region property back on the map
+plot_region_property_map(
+  seg,
+  values = setNames(phot$flux_wide$n_pix, phot$flux_wide$region),
+  value_label = ""
+)
+
+mask_info <- build_starlet_mask(x, starlet_J = 5, starlet_scales = 2:5)
+image(mask_info$mask)
+
+cube_masked <- mask_cube(x$imDat, mask_info$mask, mode = "na")
+seg <- segment_regions(list(imDat = cube_masked, hdr = x$hdr, axDat = x$axDat),
+                       n_regions = 30,
+                       use_starlet_mask = FALSE)
+

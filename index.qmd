@@ -1,0 +1,128 @@
+---
+title: "sagui"
+---
+
+# sagui <img align="right" src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" width="240">
+
+[![GitHub](https://img.shields.io/badge/GitHub-sagui-0f4c5c?logo=github)](https://github.com/RafaelSdeSouza/sagui)
+[![License](https://img.shields.io/badge/license-MIT-0f4c5c)](LICENSE)
+[![COIN](https://img.shields.io/badge/COIN-Toolbox-c89b3c)](https://github.com/COINtoolbox)
+
+## Overview
+
+**sagui** is a photometric SED-based segmentation package for IFU data cubes. It is designed to identify spatial regions using a photometric representation of the cube, apply a starlet-based mask, cluster valid spaxels into regions, and extract integrated SEDs with propagated uncertainties for each region.
+
+In contrast to a purely spectral segmentation workflow, **sagui** is centered on:
+
+- photometric preconditioning of the cube
+- multiscale masking through starlet reconstruction
+- segmentation of valid regions
+- integrated region SEDs and uncertainties
+- region-level property maps for downstream SED fitting
+
+> Part of the **COIN Toolbox**, with a focus on concise, community-oriented tools for astronomical data analysis.
+
+## Core Workflow
+
+The intended workflow is:
+
+1. collapse the IFU cube into a photometric summary image
+2. build a starlet mask from the collapsed image
+3. segment the masked cube into regions
+4. extract integrated SEDs and uncertainties for each region
+5. project derived region properties back onto the image plane
+
+The main user-facing functions are:
+
+- `segment_regions()`
+- `build_starlet_mask()`
+- `extract_region_sed()`
+- `summarize_region_sed()`
+- `plot_region_map()`
+- `plot_region_property_map()`
+- `plot_region_property_raster()`
+
+## Installation
+
+Install from GitHub:
+
+```r
+install.packages("remotes")
+remotes::install_github("RafaelSdeSouza/sagui")
+library(sagui)
+```
+
+If you want the faster clustering backend, also install the optional acceleration packages:
+
+```r
+install.packages("fastcluster")
+install.packages("torch")
+```
+
+## Usage
+
+### Segment an IFU Cube
+
+```r
+suppressPackageStartupMessages({
+  library(sagui)
+  library(FITSio)
+})
+
+x <- FITSio::readFITS("manga-8135-12701-LOGCUBE.fits")
+
+seg <- segment_regions(
+  input = x,
+  Ncomp = 30,
+  use_starlet_mask = TRUE,
+  starlet_J = 5,
+  starlet_scales = 2:5
+)
+
+plot_region_map(seg, palette = "magma")
+```
+
+### Extract Integrated SEDs
+
+```r
+sed <- extract_region_sed(
+  cube = x,
+  labels = seg$cluster_map,
+  band_values = FITSio::axVec(3, x$axDat)
+)
+
+head(sed$flux_long)
+```
+
+### Plot a Region Property
+
+```r
+plot_region_property_map(
+  seg,
+  values = setNames(sed$flux_wide$n_pix, sed$flux_wide$region),
+  value_label = "Pixels per region"
+)
+```
+
+## Package Logic
+
+The segmentation stage and the SED summary stage are intentionally separated:
+
+- clustering operates on scaled per-spaxel vectors
+- region summaries are based on integrated SEDs, not median representative spectra
+
+This makes **sagui** better aligned with workflows where the final product is a region-integrated SED plus uncertainty for fitting or physical interpretation.
+
+## Dependencies
+
+- **FITSio** for FITS cube handling
+- **dplyr**, **tidyr**, **tibble** for table reshaping
+- **ggplot2**, **viridis**, **sf** for visualization
+- **matrixStats** and **Matrix** for efficient numerical operations
+- **fastcluster** and **torch** as optional clustering accelerators
+
+## References
+
+1. Bundy, Kevin, et al. (2015). *Overview of the SDSS-IV MaNGA Survey: Mapping Nearby Galaxies at Apache Point Observatory.* The Astrophysical Journal, 798(1), 7. <https://doi.org/10.1088/0004-637X/798/1/7>
+2. de Souza, R. S., et al. (2025). *CAPIVARA: A spectral-based segmentation method for IFU data cubes.* Monthly Notices of the Royal Astronomical Society, 539(4), 3166-3179. <https://doi.org/10.1093/mnras/staf688>
+3. Starck, J.-L., Murtagh, F., and Fadili, J. (2015). *Sparse Image and Signal Processing: Wavelets, Curvelets, Morphological Diversity.* Cambridge University Press.

@@ -1,0 +1,27 @@
+---
+title: "About"
+---
+
+## About sagui
+
+**sagui** is a photometric counterpart to **capivara**. The package keeps the general IFU segmentation logic, but it shifts the focus from representative median spectra to region-integrated photometric SEDs with uncertainty propagation.
+
+This makes it useful for workflows where segmentation is only the first step, followed by:
+
+- SED fitting
+- region-wise flux integration
+- stellar population analysis
+- property-map generation
+
+## COIN Toolbox
+
+**sagui** is part of the broader **COIN Toolbox** effort to provide open, reusable tools for astronomical inference, statistical modeling, and data-driven workflows.
+
+The COIN identity is community-oriented, method-focused, and designed to support reproducible science.
+
+## Design Principles
+
+- concise public API
+- robust defaults for real IFU cubes
+- clear separation between segmentation and region-level summaries
+- optional acceleration without forcing heavyweight dependencies

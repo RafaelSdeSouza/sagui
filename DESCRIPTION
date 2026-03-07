@@ -1,0 +1,33 @@
+Package: sagui
+Title: Photometric Analysis Tools for Spectral Cubes
+Version: 0.0.0.9000
+Authors@R: 
+    person("Rafael", "S. de Souza", 
+           email = "rd23aag@herts.ac.uk",
+           role = c("aut", "cre"))
+Description: Provides tools for photometry, segmentation, visualization, and
+    robust summary statistics on hyperspectral and integral-field spectroscopic
+    (IFU) data cubes. Includes utilities for region-based flux integration,
+    background estimation, variance-aware summaries, and multiscale masking.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.1.0)
+Imports:
+    dplyr,
+    FITSio,
+    ggplot2,
+    Matrix,
+    matrixStats,
+    sf,
+    tibble,
+    tidyr,
+    viridis
+Suggests:
+    fastcluster,
+    imager,
+    imagerExtra,
+    testthat (>= 3.0.0),
+    torch
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Config/testthat/edition: 3
