@@ -6,7 +6,9 @@ title: "sagui"
 [![License](https://img.shields.io/badge/license-MIT-0f4c5c)](LICENSE)
 [![COIN](https://img.shields.io/badge/COIN-Toolbox-c89b3c)](https://github.com/COINtoolbox)
 
-![](https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg){fig-align="right" width="340"}
+<div style="float: right; margin: -1.2rem 0 0.8rem 1.2rem;">
+  <img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" width="180" alt="COIN logo">
+</div>
 
 ## Overview
 
