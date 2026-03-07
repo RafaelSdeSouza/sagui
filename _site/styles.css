@@ -1,0 +1,52 @@
+:root {
+  --coin-navy: #0f4c5c;
+  --coin-gold: #c89b3c;
+  --coin-ink: #19323c;
+  --coin-paper: #f7f4ec;
+  --coin-mist: #dbe7ea;
+}
+
+body {
+  color: var(--coin-ink);
+  background:
+    radial-gradient(circle at top right, rgba(200, 155, 60, 0.15), transparent 28%),
+    linear-gradient(180deg, #fbfaf6 0%, var(--coin-paper) 100%);
+}
+
+.navbar {
+  background: rgba(15, 76, 92, 0.96);
+}
+
+.navbar, .navbar a, .navbar-brand {
+  color: #fff !important;
+}
+
+.quarto-title-block .title {
+  color: var(--coin-navy);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+h1, h2, h3 {
+  color: var(--coin-navy);
+}
+
+a {
+  color: #21609d;
+}
+
+blockquote {
+  border-left: 4px solid var(--coin-gold);
+  background: rgba(200, 155, 60, 0.08);
+  padding: 0.8rem 1rem;
+  border-radius: 0.25rem;
+}
+
+pre, code {
+  border-radius: 0.35rem;
+}
+
+.page-footer {
+  background: transparent;
+  color: var(--coin-ink);
+}
