@@ -5,7 +5,7 @@ title: ""
 ```{=html}
 <div class="hero-brand">
   <div class="hero-brand-copy">
-    <h1 class="hero-title">sagui</h1>
+    <div class="hero-title">sagui</div>
     <div class="hero-copy">Photometric SED-based segmentation for IFU data cubes.</div>
     <div class="hero-actions">
       <a class="hero-button hero-button-primary" href="#installation">Install</a>
