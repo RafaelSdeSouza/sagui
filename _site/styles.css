@@ -1,0 +1,168 @@
+:root {
+  --coin-navy: #0f4c5c;
+  --coin-gold: #c89b3c;
+  --coin-ink: #19323c;
+  --coin-paper: #f7f4ec;
+  --coin-mist: #dbe7ea;
+}
+
+body {
+  color: var(--coin-ink);
+  background:
+    radial-gradient(circle at top right, rgba(200, 155, 60, 0.15), transparent 28%),
+    linear-gradient(180deg, #fbfaf6 0%, var(--coin-paper) 100%);
+}
+
+.navbar {
+  background: rgba(15, 76, 92, 0.96);
+}
+
+.navbar, .navbar a, .navbar-brand {
+  color: #fff !important;
+}
+
+.quarto-title-block .title {
+  color: var(--coin-navy);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.hero-title {
+  color: var(--coin-navy);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.hero-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.hero-brand-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hero-brand-logos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.7rem;
+  flex: 0 0 auto;
+}
+
+.hero-logo {
+  width: min(150px, 18vw);
+  max-width: 100%;
+  max-height: 96px;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.hero-copy {
+  font-size: 1.4rem;
+  line-height: 1.35;
+  max-width: 42rem;
+  color: var(--coin-ink);
+  margin: 0.2rem 0 1.1rem 0;
+}
+
+.hero-affiliation {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  color: #5d6f78;
+  font-size: 0.98rem;
+}
+
+.hero-note-logo {
+  width: 72px;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0 0 1rem 0;
+}
+
+.hero-button {
+  display: inline-block;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(15, 76, 92, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--coin-navy);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.hero-button:hover {
+  background: rgba(15, 76, 92, 0.08);
+  color: var(--coin-navy);
+}
+
+.hero-button-primary {
+  background: var(--coin-navy);
+  color: #fff;
+  border-color: var(--coin-navy);
+}
+
+.hero-button-primary:hover {
+  background: #124e5e;
+  color: #fff;
+}
+
+@media (max-width: 860px) {
+  .hero-brand {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-brand-logos {
+    align-items: flex-start;
+  }
+
+  .hero-logo {
+    width: min(130px, 42vw);
+    max-height: 84px;
+  }
+
+  .hero-affiliation {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+}
+
+h1, h2, h3 {
+  color: var(--coin-navy);
+}
+
+a {
+  color: #21609d;
+}
+
+blockquote {
+  border-left: 4px solid var(--coin-gold);
+  background: rgba(200, 155, 60, 0.08);
+  padding: 0.8rem 1rem;
+  border-radius: 0.25rem;
+}
+
+pre, code {
+  border-radius: 0.35rem;
+}
+
+.page-footer {
+  background: transparent;
+  color: var(--coin-ink);
+}
