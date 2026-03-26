@@ -12,7 +12,7 @@ mask_cube <- function(cube, labels, mode = c("zero","na")) {
   stopifnot(is.array(cube), length(dim(cube)) == 3L, is.matrix(labels))
   H <- dim(cube)[1]; W <- dim(cube)[2]; B <- dim(cube)[3]
   stopifnot(identical(dim(labels), c(H, W)))
-  m <- (labels > 0)
+  m <- is.finite(labels) & (labels > 0)
   m3 <- array(m, dim = c(H, W, B))
   out <- cube
   if (mode == "zero") {

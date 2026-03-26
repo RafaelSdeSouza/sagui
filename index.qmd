@@ -24,6 +24,7 @@ Part of the <strong>COIN Toolbox</strong>, focused on concise and reusable metho
 
 - build a white-light representation of an IFU cube
 - derive a starlet-based photometric mask
+- optionally pretransform the valid spectra before clustering
 - cluster valid spaxels into regions
 - extract integrated SEDs and propagated uncertainties
 - project region properties back onto the image plane
@@ -40,7 +41,7 @@ Collapse the cube, reconstruct selected starlet scales, and isolate spatially me
 ::: {.g-col-12 .g-col-md-4}
 ### Region Segmentation
 
-Segment only the valid spaxels, keeping the clustering logic aligned with the original `capivara` workflow.
+Segment only the valid spaxels, keeping the clustering logic aligned with the original `capivara` workflow while allowing benchmarkable spectral pretransforms.
 :::
 
 ::: {.g-col-12 .g-col-md-4}
@@ -65,7 +66,8 @@ seg <- segment_regions(
   Ncomp = 30,
   use_starlet_mask = TRUE,
   starlet_J = 5,
-  starlet_scales = 2:5
+  starlet_scales = 2:5,
+  pretransform = "asinh"
 )
 
 plot_region_map(seg, palette = "magma")
@@ -98,6 +100,16 @@ sed <- extract_region_sed(
 )
 
 head(sed$flux_long)
+```
+
+## Clustering Pretransforms
+
+You can benchmark simple transforms against copula-based mappings without
+changing the rest of the segmentation workflow:
+
+```r
+seg_asinh <- segment_regions(x, Ncomp = 30, pretransform = "asinh")
+seg_copula <- segment_regions(x, Ncomp = 30, pretransform = "copula_gaussian")
 ```
 
 ## Region Property Maps

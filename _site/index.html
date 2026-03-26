@@ -176,6 +176,7 @@ sagui <img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/
 <ul>
 <li>build a white-light representation of an IFU cube</li>
 <li>derive a starlet-based photometric mask</li>
+<li>optionally pretransform the valid spectra before clustering</li>
 <li>cluster valid spaxels into regions</li>
 <li>extract integrated SEDs and propagated uncertainties</li>
 <li>project region properties back onto the image plane</li>
@@ -190,7 +191,7 @@ sagui <img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/
 </section>
 <section id="region-segmentation" class="level3 g-col-12 g-col-md-4">
 <h3 class="anchored" data-anchor-id="region-segmentation">Region Segmentation</h3>
-<p>Segment only the valid spaxels, keeping the clustering logic aligned with the original <code>capivara</code> workflow.</p>
+<p>Segment only the valid spaxels, keeping the clustering logic aligned with the original <code>capivara</code> workflow while allowing benchmarkable spectral pretransforms.</p>
 </section>
 <section id="integrated-region-seds" class="level3 g-col-12 g-col-md-4">
 <h3 class="anchored" data-anchor-id="integrated-region-seds">Integrated Region SEDs</h3>
@@ -212,10 +213,11 @@ sagui <img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Ncomp =</span> <span class="dv">30</span>,</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">use_starlet_mask =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">starlet_J =</span> <span class="dv">5</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">starlet_scales =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">5</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_region_map</span>(seg, <span class="at">palette =</span> <span class="st">"magma"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">starlet_scales =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">pretransform =</span> <span class="st">"asinh"</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_region_map</span>(seg, <span class="at">palette =</span> <span class="st">"magma"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
@@ -237,13 +239,19 @@ sagui <img src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sed<span class="sc">$</span>flux_long)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
+<section id="clustering-pretransforms" class="level2">
+<h2 class="anchored" data-anchor-id="clustering-pretransforms">Clustering Pretransforms</h2>
+<p>You can benchmark simple transforms against copula-based mappings without changing the rest of the segmentation workflow:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>seg_asinh <span class="ot">&lt;-</span> <span class="fu">segment_regions</span>(x, <span class="at">Ncomp =</span> <span class="dv">30</span>, <span class="at">pretransform =</span> <span class="st">"asinh"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>seg_copula <span class="ot">&lt;-</span> <span class="fu">segment_regions</span>(x, <span class="at">Ncomp =</span> <span class="dv">30</span>, <span class="at">pretransform =</span> <span class="st">"copula_gaussian"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
 <section id="region-property-maps" class="level2">
 <h2 class="anchored" data-anchor-id="region-property-maps">Region Property Maps</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_region_property_map</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  seg,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">values =</span> <span class="fu">setNames</span>(sed<span class="sc">$</span>flux_wide<span class="sc">$</span>n_pix, sed<span class="sc">$</span>flux_wide<span class="sc">$</span>region),</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">value_label =</span> <span class="st">"Pixels per region"</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_region_property_map</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  seg,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">values =</span> <span class="fu">setNames</span>(sed<span class="sc">$</span>flux_wide<span class="sc">$</span>n_pix, sed<span class="sc">$</span>flux_wide<span class="sc">$</span>region),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">value_label =</span> <span class="st">"Pixels per region"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="why-sagui" class="level2">
 <h2 class="anchored" data-anchor-id="why-sagui">Why sagui</h2>

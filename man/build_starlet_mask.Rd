@@ -7,6 +7,7 @@
 build_starlet_mask(
   input,
   collapse_fn = collapse_white_light,
+  pretransform = "none",
   starlet_J = 5,
   starlet_scales = 2:5,
   include_coarse = FALSE,
@@ -19,6 +20,11 @@ build_starlet_mask(
 \item{input}{3-D array or FITS-like list with \code{imDat}.}
 
 \item{collapse_fn}{Function used to collapse the cube to a 2-D image.}
+
+\item{pretransform}{Optional spectral pretransform applied to the cube before
+the white-light collapse and starlet decomposition. This is useful when the
+photometric mask should be derived from a transformed representation rather
+than the original flux cube.}
 
 \item{starlet_J}{Number of starlet scales.}
 

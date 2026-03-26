@@ -23,5 +23,6 @@ The COIN identity is community-oriented, method-focused, and designed to support
 
 - concise public API
 - robust defaults for real IFU cubes
+- standalone transforms that can also be called inside segmentation
 - clear separation between segmentation and region-level summaries
 - optional acceleration without forcing heavyweight dependencies

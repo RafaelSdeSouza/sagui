@@ -29,7 +29,8 @@ seg <- segment_regions(
   Ncomp = 30,
   use_starlet_mask = TRUE,
   starlet_J = 5,
-  starlet_scales = 2:5
+  starlet_scales = 2:5,
+  pretransform = "asinh"
 )
 
 sed <- extract_region_sed(
@@ -45,5 +46,6 @@ sed <- extract_region_sed(
 
 - photometric masking with starlet reconstruction
 - region segmentation of IFU cubes
+- optional spectral pretransforms for clustering benchmarks
 - integrated region SEDs with uncertainties
 - region-level visualization for downstream fitting

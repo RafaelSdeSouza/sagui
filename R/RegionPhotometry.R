@@ -90,7 +90,7 @@ RegionPhotometry <- function(
 
   # --- background: ignorado (compatibilidade)
   if (!is.null(bkg)) {
-    warning("'bkg' foi descontinuado e será ignorado em RegionPhotometry().")
+    warning("`bkg` is deprecated and ignored in `RegionPhotometry()`.")
   }
 
   # --- variância ---
@@ -113,7 +113,7 @@ RegionPhotometry <- function(
   valid <- is.finite(cls) & (cls > 0)
 
   if (!any(valid)) {
-    warning("Nenhum pixel válido (labels > 0 & finitos). Retornando tabelas vazias.")
+    warning("No valid pixels found (`labels > 0` and finite). Returning empty tables.")
     empty <- tibble::tibble(region = integer(), band = character(), flux = numeric(),
                             flux_err = numeric(), n_eff = integer(), n_pix = integer(),
                             lambda = numeric())

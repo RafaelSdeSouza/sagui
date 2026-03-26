@@ -2,6 +2,10 @@
 #'
 #' @param input 3-D array or FITS-like list with `imDat`.
 #' @param collapse_fn Function used to collapse the cube to a 2-D image.
+#' @param pretransform Optional spectral pretransform applied to the cube before
+#'   the white-light collapse and starlet decomposition. This is useful when the
+#'   photometric mask should be derived from a transformed representation rather
+#'   than the original flux cube.
 #' @param starlet_J Number of starlet scales.
 #' @param starlet_scales Scales to reconstruct.
 #' @param include_coarse Logical; include the coarse plane in the reconstruction.
@@ -12,6 +16,7 @@
 #' @export
 build_starlet_mask <- function(input,
                                collapse_fn = collapse_white_light,
+                               pretransform = "none",
                                starlet_J = 5,
                                starlet_scales = 2:5,
                                include_coarse = FALSE,
@@ -22,7 +27,8 @@ build_starlet_mask <- function(input,
   cube <- if (is.list(input) && !is.null(input$imDat)) input$imDat else input
   stopifnot(is.array(cube), length(dim(cube)) == 3L)
 
-  collapsed <- collapse_fn(cube)
+  transformed_cube <- pretransform_cube(cube, method = pretransform)
+  collapsed <- collapse_fn(transformed_cube)
   decomposition <- starlet_mask(collapsed, J = starlet_J)
   reconstruction <- starlet_reconstruct(
     decomposition,
@@ -90,6 +96,16 @@ build_starlet_mask <- function(input,
 #' @param Ncomp Number of output regions.
 #' @param redshift Reserved compatibility argument carried over from `capivara`.
 #'   Currently unused.
+#' @param pretransform Deprecated alias for `cluster_pretransform`.
+#' @param mask_pretransform Optional spectral pretransform applied before the
+#'   white-light collapse and starlet mask. This lets the segmentation mask be
+#'   built on a transformed photometric representation while leaving the
+#'   clustering stage untouched.
+#' @param cluster_pretransform Optional spectral pretransform applied to the
+#'   valid spectra matrix before row-wise scaling and clustering. May be one of
+#'   `"none"`, `"asinh"`, `"log1p"`, `"signed_log1p"`, `"copula_uniform"`,
+#'   `"copula_gaussian"`, or a custom function returning a matrix with the same
+#'   dimensions as the input.
 #' @param scale_fn Per-spectrum scaling function applied row-wise before
 #'   clustering.
 #' @param n_regions Deprecated alias for `Ncomp`.
@@ -108,6 +124,9 @@ build_starlet_mask <- function(input,
 segment_regions <- function(input,
                             Ncomp = 5,
                             redshift = 0,
+                            pretransform = NULL,
+                            mask_pretransform = "none",
+                            cluster_pretransform = "none",
                             scale_fn = median_scale,
                             n_regions = NULL,
                             use_starlet_mask = TRUE,
@@ -124,6 +143,9 @@ segment_regions <- function(input,
   mask_mode <- match.arg(mask_mode)
   if (!is.null(n_regions)) {
     Ncomp <- n_regions
+  }
+  if (!is.null(pretransform)) {
+    cluster_pretransform <- pretransform
   }
 
   cubedat <- if (is.list(input) && !is.null(input$imDat)) {
@@ -143,6 +165,7 @@ segment_regions <- function(input,
     mask_info <- build_starlet_mask(
       input = cubedat,
       collapse_fn = collapse_fn,
+      pretransform = mask_pretransform,
       starlet_J = starlet_J,
       starlet_scales = starlet_scales,
       include_coarse = include_coarse,
@@ -195,8 +218,9 @@ segment_regions <- function(input,
   signal_valid <- signal[valid_indices]
   noise_valid <- noise[valid_indices]
 
+  transformed_data <- pretransform_spectra(IFU2D_valid, method = cluster_pretransform)
   scaler <- if (is.null(scale_fn)) .safe_scale_spectrum else scale_fn
-  scaled_data <- t(apply(IFU2D_valid, 1, scaler))
+  scaled_data <- t(apply(transformed_data, 1, scaler))
   scaled_data[!is.finite(scaled_data)] <- 0
 
   distance_matrix <- .compute_distance_matrix(scaled_data)
@@ -225,6 +249,8 @@ segment_regions <- function(input,
     axDat = cubedat$axDat,
     original_cube = cubedat,
     redshift = redshift,
+    mask_pretransform = if (is.function(mask_pretransform)) "custom" else mask_pretransform,
+    cluster_pretransform = if (is.function(cluster_pretransform)) "custom" else cluster_pretransform,
     hclust = hc
   )
 }

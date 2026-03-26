@@ -8,6 +8,9 @@ segment_regions(
   input,
   Ncomp = 5,
   redshift = 0,
+  pretransform = NULL,
+  mask_pretransform = "none",
+  cluster_pretransform = "none",
   scale_fn = median_scale,
   n_regions = NULL,
   use_starlet_mask = TRUE,
@@ -29,6 +32,19 @@ segment_regions(
 
 \item{redshift}{Reserved compatibility argument carried over from \code{capivara}.
 Currently unused.}
+
+\item{pretransform}{Deprecated alias for \code{cluster_pretransform}.}
+
+\item{mask_pretransform}{Optional spectral pretransform applied before the
+white-light collapse and starlet mask. This lets the segmentation mask be
+built on a transformed photometric representation while leaving the
+clustering stage untouched.}
+
+\item{cluster_pretransform}{Optional spectral pretransform applied to the
+valid spectra matrix before row-wise scaling and clustering. May be one of
+\code{"none"}, \code{"asinh"}, \code{"log1p"}, \code{"signed_log1p"}, \code{"copula_uniform"},
+\code{"copula_gaussian"}, or a custom function returning a matrix with the same
+dimensions as the input.}
 
 \item{scale_fn}{Per-spectrum scaling function applied row-wise before
 clustering.}
