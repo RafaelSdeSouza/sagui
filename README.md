@@ -1,4 +1,4 @@
-# sagui
+# sagui <img align="right" src="images/sagui_upscaled.png" width="190" alt="sagui logo">
 
 Photometric SED-based segmentation for IFU data cubes.
 
