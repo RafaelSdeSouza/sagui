@@ -5,24 +5,12 @@ title: ""
 <div class="hero-brand">
   <div class="hero-brand-copy">
     <h1 class="hero-title">sagui</h1>
-
-    <div class="hero-copy">
-    Photometric SED-based segmentation for IFU data cubes.
-    </div>
-
-    <div class="hero-actions">
-      <a class="hero-button hero-button-primary" href="#installation">Install</a>
-      <a class="hero-button" href="#quick-start">Quick Start</a>
-      <a class="hero-button" href="https://github.com/RafaelSdeSouza/sagui">GitHub</a>
-    </div>
+    <div class="hero-copy">Photometric SED-based segmentation for IFU data cubes.</div>
+    <div class="hero-actions"><a class="hero-button hero-button-primary" href="#installation">Install</a><a class="hero-button" href="#quick-start">Quick Start</a><a class="hero-button" href="https://github.com/RafaelSdeSouza/sagui">GitHub</a></div>
   </div>
-
   <div class="hero-brand-logos">
-    <img class="hero-logo" src="images/sagui_upscaled.png" alt="sagui logo">
-    <div class="hero-affiliation">
-      <img class="hero-note-logo" src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" alt="COIN logo">
-      <span>Part of the <strong>COIN Toolbox</strong></span>
-    </div>
+    <img class="hero-logo" src="images/sagui_upscaled.png" alt="sagui logo" />
+    <div class="hero-affiliation"><img class="hero-note-logo" src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" alt="COIN logo" /><span>Part of the <strong>COIN Toolbox</strong></span></div>
   </div>
 </div>
 
