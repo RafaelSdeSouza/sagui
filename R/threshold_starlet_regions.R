@@ -9,6 +9,13 @@
 #' @param k numeric; multiplier for MAD (unused; kept for compat)
 #' @param tau numeric; absolute threshold when threshold == "abs"
 #' @param positive_only logical; TRUE uses rec>thr; FALSE uses |rec|>thr
+#' @param per_scale_positive logical; clamp each reconstructed starlet scale to
+#'   positive values before thresholding.
+#' @param k_hi numeric; high MAD threshold used to define seed pixels.
+#' @param k_lo numeric; low MAD threshold used to define candidate pixels.
+#' @param area_min integer; minimum connected-component area to keep.
+#' @param keep_negatives logical; retain negative reconstruction values.
+#' @param ring_nbins integer; number of radial bins for background MAD.
 #' @return list(soft_rec, hard_rec, mask, sigma, threshold, seeds, candidate)
 #' @export
 threshold_starlet_regions <- function(
@@ -70,13 +77,13 @@ threshold_starlet_regions <- function(
     to_cimg <- function(m) im$as.cimg(t(m), x=ncol(m), y=nrow(m), cc=1, z=1)
     to_mat  <- function(ci) t(as.matrix(ci))
 
-    # crescer apenas componentes com sementes acima de thr_hi
+    # Grow only components with seeds above thr_hi.
     lab <- to_mat(im$label(to_cimg(candidate)))
     seed_labels <- unique(lab[seeds & candidate])
     seed_labels <- seed_labels[is.finite(seed_labels) & seed_labels > 0]
     keep_mask <- candidate & (lab %in% seed_labels)
 
-    # remove manchas pequenas
+    # Remove small islands.
     lab2 <- to_mat(im$label(to_cimg(keep_mask)))
     if (length(unique(lab2)) > 1L) {
       tab <- table(lab2[lab2 > 0])
@@ -84,17 +91,18 @@ threshold_starlet_regions <- function(
       if (length(small)) keep_mask[ lab2 %in% small ] <- FALSE
     }
 
-    # --- safe closing: prefer imager::closing; else dilate→erode; else no-op
+    # Safe closing: prefer closing; else dilate-then-erode; else no-op.
     ci  <- to_cimg(keep_mask)
     nxk <- 3; nyk <- 3
     closing_ok <- "closing" %in% getNamespaceExports("imager")
     if (closing_ok) {
-      ci2 <- imager::closing(ci, nx = nxk, ny = nyk)
+      ci2 <- im$closing(ci, nx = nxk, ny = nyk)
     } else if (all(c("dilate_square","erode_square") %in% getNamespaceExports("imager"))) {
       s   <- max(nxk, nyk)
       ci2 <- im$erode_square(im$dilate_square(ci, size = s), size = s)
     } else if (requireNamespace("imagerExtra", quietly = TRUE)) {
-      ci2 <- imagerExtra::mclosing(ci, size = max(nxk, nyk))
+      mclosing <- get("mclosing", envir = asNamespace("imagerExtra"), inherits = FALSE)
+      ci2 <- mclosing(ci, size = max(nxk, nyk))
     } else {
       ci2 <- ci
     }

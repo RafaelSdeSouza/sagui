@@ -2,3 +2,9 @@
 ^\.Rproj\.user$
 ^_site$
 ^\.quarto$
+^\.github$
+^experiments$
+^saguiMorph$
+^saguiMorph\.Rcheck$
+^.*\.tar\.gz$
+^\.DS_Store$

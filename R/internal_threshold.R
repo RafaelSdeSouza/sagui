@@ -33,10 +33,10 @@
 #' @noRd
 .hard_thresh <- function(x, t) ifelse(abs(x) >= t, x, 0)
 
-#' Robust per-plane noise estimate (MAD / 0.6745)
+#' Robust per-plane noise estimate
 #' @keywords internal
 #' @noRd
-.estimate_sigma <- function(w) stats::mad(w, center = 0, constant = 1, na.rm = TRUE)
+.estimate_sigma <- function(w) stats::mad(w, center = 0, na.rm = TRUE)
 
 
 #' Robust sigma via MAD

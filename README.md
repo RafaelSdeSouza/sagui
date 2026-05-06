@@ -40,12 +40,31 @@ sed <- extract_region_sed(
 )
 ```
 
+For larger cubes where exact Ward clustering becomes memory-limited, use the
+sparse-Ward approximation with the same photometric mask and output structure:
+
+```r
+seg <- segment_regions_large(
+  input = x,
+  Ncomp = 30,
+  use_starlet_mask = TRUE,
+  pretransform = "asinh",
+  knn_k = 40,
+  scale_fn = identity
+)
+```
+
+`segment_regions_large()` mirrors `segment_regions()` but avoids constructing
+the full all-pairs distance matrix. Use `scale_fn = identity` for raw
+photometry, or `scale_fn = median_scale` to match the default exact workflow.
+
 ## Scope
 
 `sagui` focuses on:
 
 - photometric masking with starlet reconstruction
 - region segmentation of IFU cubes
+- sparse-Ward segmentation for large photometric cubes
 - optional spectral pretransforms for clustering benchmarks
 - integrated region SEDs with uncertainties
 - region-level visualization for downstream fitting

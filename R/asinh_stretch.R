@@ -1,3 +1,15 @@
+#' Asinh-stretch an image or numeric array
+#'
+#' @param x Numeric vector, matrix, or array.
+#' @param qlo Lower quantile used as the display floor.
+#' @param qhi Upper quantile used as the display ceiling.
+#' @param scale Optional asinh scale. If `NULL`, it is estimated from the
+#'   quantile range.
+#' @param nonneg Logical; clamp negative values to zero before stretching.
+#' @param na.rm Logical; ignore non-finite values when estimating quantiles.
+#'
+#' @return `x` transformed to an asinh-stretched numeric object with the same
+#'   dimensions.
 #' @export
 asinh_stretch <- function(x, qlo = 0.001, qhi = 0.999, scale = NULL,
                           nonneg = TRUE, na.rm = TRUE) {

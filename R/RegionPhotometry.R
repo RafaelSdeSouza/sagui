@@ -34,7 +34,7 @@
 #' @importFrom FITSio axVec
 RegionPhotometry <- function(
     cube, labels,
-    bkg = NULL,                 # mantido, porém ignorado
+    bkg = NULL,                 # kept for compatibility, ignored
     var_cube = NULL,
     sigma_band = NULL,
     band_values = NULL,
@@ -47,7 +47,7 @@ RegionPhotometry <- function(
   # --- helpers ---
   get_imdat <- function(x) if (is.list(x) && !is.null(x$imDat)) x$imDat else x
 
-  # [nx,ny,nb] -> [n_pix, nb], colunas = bandas
+  # [nx, ny, nb] -> [n_pix, nb], columns = bands.
   to_mat <- function(A3) {
     nb <- dim(A3)[3]
     t(matrix(aperm(A3, c(3, 1, 2)), nrow = nb))
@@ -64,7 +64,7 @@ RegionPhotometry <- function(
   }
   stopifnot(is.matrix(labels), all(dim(labels)[1:2] == c(nx, ny)))
 
-  # bands (valores + rótulos)
+  # Bands: values and labels.
   if (!is.null(band_values)) {
     bands <- band_values
   } else if (is.list(cube) && !is.null(cube$axDat)) {
@@ -74,7 +74,7 @@ RegionPhotometry <- function(
   }
   stopifnot(length(bands) == nb)
 
-  # rótulos seguros (sem padding) + mapeamento numérico para lambda
+  # Safe labels plus numeric mapping for lambda.
   if (is.numeric(bands)) {
     band_names <- sprintf("%.*g", digits_lambda_colnames, bands)
   } else {
@@ -85,15 +85,15 @@ RegionPhotometry <- function(
 
   band_map <- tibble::tibble(
     band   = band_names,
-    lambda = suppressWarnings(as.numeric(bands))  # numérico se possível
+    lambda = suppressWarnings(as.numeric(bands))  # numeric when possible
   )
 
-  # --- background: ignorado (compatibilidade)
+  # --- background: ignored for compatibility
   if (!is.null(bkg)) {
     warning("`bkg` is deprecated and ignored in `RegionPhotometry()`.")
   }
 
-  # --- variância ---
+  # --- variance ---
   use_var <- FALSE
   if (!is.null(var_cube)) {
     Vc <- get_imdat(var_cube); stopifnot(is.array(Vc), all(dim(Vc) == dim(M)))
@@ -147,14 +147,14 @@ RegionPhotometry <- function(
       dplyr::mutate(var = NA_real_)
   }
 
-  # região + flag ok
+  # Region plus finite-data flag.
   df2 <- df |>
     dplyr::mutate(
       region = clsv[pix],
       ok = if (use_var) (is.finite(flux) & is.finite(var)) else is.finite(flux)
     )
 
-  # --- agregação por região × banda ---
+  # --- aggregate by region and band ---
   df_sum <- df2 |>
     dplyr::group_by(region, band) |>
     dplyr::summarise(
@@ -173,11 +173,11 @@ RegionPhotometry <- function(
     ) |>
     dplyr::select(region, band, flux, flux_err, n_eff)
 
-  # fallback "mad_sky" (estima sigma por banda em pixels de céu)
+  # Fallback "mad_sky": estimate per-band sigma from sky pixels.
   if (!use_var && identical(error_fallback, "mad_sky")) {
     sky <- !is.finite(cls) | (cls <= 0)
     if (!any(sky)) {
-      warning("Sem pixels de céu (labels <= 0). Caindo para 'flux_over_sqrt_n'.")
+      warning("No sky pixels found (labels <= 0). Falling back to 'flux_over_sqrt_n'.")
       df_sum <- df_sum |>
         dplyr::mutate(flux_err = ifelse(is.finite(flux_err), flux_err, abs(flux)/sqrt(pmax(n_eff,1))))
     } else {
@@ -192,10 +192,10 @@ RegionPhotometry <- function(
     }
   }
 
-  # anexar lambda (numérica) para plot
+  # Attach numeric lambda for plotting.
   df_sum <- dplyr::left_join(df_sum, band_map, by = "band")
 
-  # contagem de pixels por região
+  # Count pixels by region.
   n_pix_region <- tibble::tibble(region = clsv) |>
     dplyr::count(region, name = "n_pix")
 
@@ -224,7 +224,7 @@ RegionPhotometry <- function(
     dplyr::left_join(neff_wide, by = "region") |>
     dplyr::left_join(err_wide, by = "region")
 
-  # --- painted cube (opcional)
+  # --- painted cube (optional)
   painted_cube <- NULL
   if (isTRUE(return_painted_cube)) {
     painted_cube <- array(NA_real_, dim = dim(M))
@@ -246,7 +246,7 @@ RegionPhotometry <- function(
   }
 
   list(
-    flux_long    = flux_long,   # tem 'lambda' numérica
+    flux_long    = flux_long,   # includes numeric lambda
     flux_wide    = flux_wide,
     painted_cube = painted_cube,
     bands        = bands,

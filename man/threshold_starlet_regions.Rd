@@ -40,6 +40,19 @@ threshold_starlet_regions(
 \item{tau}{numeric; absolute threshold when threshold == "abs"}
 
 \item{positive_only}{logical; TRUE uses rec>thr; FALSE uses |rec|>thr}
+
+\item{per_scale_positive}{logical; clamp each reconstructed starlet scale to
+positive values before thresholding.}
+
+\item{k_hi}{numeric; high MAD threshold used to define seed pixels.}
+
+\item{k_lo}{numeric; low MAD threshold used to define candidate pixels.}
+
+\item{area_min}{integer; minimum connected-component area to keep.}
+
+\item{keep_negatives}{logical; retain negative reconstruction values.}
+
+\item{ring_nbins}{integer; number of radial bins for background MAD.}
 }
 \value{
 list(soft_rec, hard_rec, mask, sigma, threshold, seeds, candidate)

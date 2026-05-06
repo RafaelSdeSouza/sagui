@@ -1,2 +1,11 @@
 /.quarto/
+.Rproj.user/
+_site/
 **/*.quarto_ipynb
+.DS_Store
+*.tar.gz
+*.Rcheck/
+src/*.o
+src/*.so
+experiments/
+saguiMorph/

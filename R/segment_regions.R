@@ -20,7 +20,7 @@ build_starlet_mask <- function(input,
                                starlet_J = 5,
                                starlet_scales = 2:5,
                                include_coarse = FALSE,
-                               denoise_k = 0,
+                               denoise_k = 2.5,
                                mode = c("soft", "hard"),
                                positive_only = TRUE) {
   mode <- match.arg(mode)
@@ -107,9 +107,15 @@ build_starlet_mask <- function(input,
 #'   `"copula_gaussian"`, or a custom function returning a matrix with the same
 #'   dimensions as the input.
 #' @param scale_fn Per-spectrum scaling function applied row-wise before
-#'   clustering.
+#'   clustering. Use `identity` for no row scaling.
 #' @param n_regions Deprecated alias for `Ncomp`.
 #' @param use_starlet_mask Logical; if `TRUE`, derive a photometric mask before clustering.
+#' @param support_method Foreground support builder used when
+#'   `use_starlet_mask = TRUE`. Options are `"starlet"` (default),
+#'   `"starlet_contourlet"` (recommended directional refinement), and
+#'   `"contourlet"` (standalone directional support; more experimental).
+#' @param support_args Optional named list passed to [build_contourlet_mask()]
+#'   when `support_method` is not `"starlet"`.
 #' @param collapse_fn Function used to collapse the cube to a 2-D image.
 #' @param starlet_J Number of starlet scales.
 #' @param starlet_scales Scales to keep when reconstructing the starlet image.
@@ -130,17 +136,20 @@ segment_regions <- function(input,
                             scale_fn = median_scale,
                             n_regions = NULL,
                             use_starlet_mask = TRUE,
+                            support_method = c("starlet", "starlet_contourlet", "contourlet"),
+                            support_args = list(),
                             collapse_fn = collapse_white_light,
                             starlet_J = 5,
                             starlet_scales = 2:5,
                             include_coarse = FALSE,
-                            denoise_k = 0,
+                            denoise_k = 2.5,
                             mode = c("soft", "hard"),
                             positive_only = TRUE,
                             mask_mode = c("na", "zero"),
                             hclust_method = "ward.D2") {
   mode <- match.arg(mode)
   mask_mode <- match.arg(mask_mode)
+  support_method <- match.arg(support_method)
   if (!is.null(n_regions)) {
     Ncomp <- n_regions
   }
@@ -162,17 +171,39 @@ segment_regions <- function(input,
   spectra <- cube_to_matrix(cubedat)
 
   if (isTRUE(use_starlet_mask)) {
-    mask_info <- build_starlet_mask(
-      input = cubedat,
-      collapse_fn = collapse_fn,
-      pretransform = mask_pretransform,
-      starlet_J = starlet_J,
-      starlet_scales = starlet_scales,
-      include_coarse = include_coarse,
-      denoise_k = denoise_k,
-      mode = mode,
-      positive_only = positive_only
-    )
+    if (support_method == "starlet") {
+      mask_info <- build_starlet_mask(
+        input = cubedat,
+        collapse_fn = collapse_fn,
+        pretransform = mask_pretransform,
+        starlet_J = starlet_J,
+        starlet_scales = starlet_scales,
+        include_coarse = include_coarse,
+        denoise_k = denoise_k,
+        mode = mode,
+        positive_only = positive_only
+      )
+    } else {
+      contourlet_defaults <- list(
+        input = cubedat,
+        collapse_fn = collapse_fn,
+        pretransform = mask_pretransform,
+        combine = if (support_method == "starlet_contourlet") "hybrid" else "standalone",
+        starlet_J = starlet_J,
+        starlet_scales = starlet_scales,
+        include_coarse = include_coarse,
+        denoise_k = denoise_k,
+        mode = mode,
+        positive_only = positive_only
+      )
+      if (!is.list(support_args)) {
+        stop("`support_args` must be a named list.")
+      }
+      mask_info <- do.call(
+        build_contourlet_mask,
+        utils::modifyList(contourlet_defaults, support_args)
+      )
+    }
     spatial_mask <- mask_info$mask
   } else {
     collapsed <- collapse_fn(cube)
@@ -240,8 +271,24 @@ segment_regions <- function(input,
     mask = spatial_mask,
     collapsed = mask_info$collapsed,
     starlet = list(
-      decomposition = mask_info$decomposition,
-      reconstruction = mask_info$reconstruction
+      decomposition = if (!is.null(mask_info$decomposition)) {
+        mask_info$decomposition
+      } else if (!is.null(mask_info$base_support)) {
+        mask_info$base_support$decomposition
+      } else {
+        NULL
+      },
+      reconstruction = if (!is.null(mask_info$reconstruction)) {
+        mask_info$reconstruction
+      } else if (!is.null(mask_info$base_support)) {
+        mask_info$base_support$reconstruction
+      } else {
+        NULL
+      }
+    ),
+    support = list(
+      method = if (isTRUE(use_starlet_mask)) support_method else "none",
+      details = mask_info
     ),
     masked_cube = masked_cube,
     cluster_snr = cluster_snr,
@@ -250,6 +297,7 @@ segment_regions <- function(input,
     original_cube = cubedat,
     redshift = redshift,
     mask_pretransform = if (is.function(mask_pretransform)) "custom" else mask_pretransform,
+    support_method = if (isTRUE(use_starlet_mask)) support_method else "none",
     cluster_pretransform = if (is.function(cluster_pretransform)) "custom" else cluster_pretransform,
     hclust = hc
   )

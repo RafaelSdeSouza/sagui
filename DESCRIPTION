@@ -18,11 +18,16 @@ Imports:
     ggplot2,
     Matrix,
     matrixStats,
+    RANN,
+    Rcpp,
     sf,
     tibble,
     tidyr,
     viridis
+LinkingTo:
+    Rcpp
 Suggests:
+    EBImage,
     fastcluster,
     imager,
     imagerExtra,

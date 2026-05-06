@@ -46,7 +46,7 @@ Collapse the cube, reconstruct selected starlet scales, and isolate spatially me
 ::: {.g-col-12 .g-col-md-4}
 ### Region Segmentation
 
-Segment only the valid spaxels, keeping the clustering logic aligned with the original `capivara` workflow while allowing benchmarkable spectral pretransforms.
+Segment only the valid spaxels, using exact Ward clustering for small cubes or sparse Ward for large photometric cubes.
 :::
 
 ::: {.g-col-12 .g-col-md-4}
@@ -78,6 +78,19 @@ seg <- segment_regions(
 plot_region_map(seg, palette = "magma")
 ```
 
+For large cubes, switch to the memory-aware sparse-Ward backend:
+
+```r
+seg <- segment_regions_large(
+  input = x,
+  Ncomp = 30,
+  use_starlet_mask = TRUE,
+  pretransform = "asinh",
+  knn_k = 40,
+  scale_fn = identity
+)
+```
+
 ## Installation
 
 Install from GitHub:
@@ -88,7 +101,7 @@ remotes::install_github("RafaelSdeSouza/sagui")
 library(sagui)
 ```
 
-For the faster clustering backend:
+Optional acceleration packages for exact clustering and selected workflows:
 
 ```r
 install.packages("fastcluster")
@@ -115,6 +128,7 @@ changing the rest of the segmentation workflow:
 ```r
 seg_asinh <- segment_regions(x, Ncomp = 30, pretransform = "asinh")
 seg_copula <- segment_regions(x, Ncomp = 30, pretransform = "copula_gaussian")
+seg_large <- segment_regions_large(x, Ncomp = 30, pretransform = "asinh", knn_k = 40)
 ```
 
 ## Region Property Maps
