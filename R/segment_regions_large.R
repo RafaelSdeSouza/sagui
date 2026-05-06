@@ -161,6 +161,11 @@ segment_regions_large <- function(input,
                                   denoise_k = 2.5,
                                   mode = c("soft", "hard"),
                                   positive_only = TRUE,
+                                  clean_mask = FALSE,
+                                  min_mask_area = 1L,
+                                  close_size = 1L,
+                                  open_size = 1L,
+                                  keep_largest = FALSE,
                                   mask_mode = c("na", "zero"),
                                   hclust_method = "ward.D2",
                                   knn_k = 40,
@@ -208,7 +213,12 @@ segment_regions_large <- function(input,
         include_coarse = include_coarse,
         denoise_k = denoise_k,
         mode = mode,
-        positive_only = positive_only
+        positive_only = positive_only,
+        clean_mask = clean_mask,
+        min_mask_area = min_mask_area,
+        close_size = close_size,
+        open_size = open_size,
+        keep_largest = keep_largest
       )
     } else {
       contourlet_defaults <- list(
@@ -229,6 +239,14 @@ segment_regions_large <- function(input,
       mask_info <- do.call(
         build_contourlet_mask,
         utils::modifyList(contourlet_defaults, support_args)
+      )
+      mask_info <- .apply_mask_cleanup(
+        mask_info,
+        clean_mask = clean_mask,
+        min_mask_area = min_mask_area,
+        close_size = close_size,
+        open_size = open_size,
+        keep_largest = keep_largest
       )
     }
     spatial_mask <- mask_info$mask

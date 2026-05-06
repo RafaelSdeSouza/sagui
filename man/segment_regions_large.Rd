@@ -23,6 +23,11 @@ segment_regions_large(
   denoise_k = 2.5,
   mode = c("soft", "hard"),
   positive_only = TRUE,
+  clean_mask = FALSE,
+  min_mask_area = 1L,
+  close_size = 1L,
+  open_size = 1L,
+  keep_largest = FALSE,
   mask_mode = c("na", "zero"),
   hclust_method = "ward.D2",
   knn_k = 40,
@@ -83,6 +88,21 @@ when \code{support_method} is not \code{"starlet"}.}
 \item{mode}{Starlet thresholding mode.}
 
 \item{positive_only}{Logical; keep only positive reconstruction values in the mask.}
+
+\item{clean_mask}{Logical; apply optional support-mask cleanup after the
+foreground support is built.}
+
+\item{min_mask_area}{Minimum connected-component area retained when
+\code{clean_mask = TRUE}.}
+
+\item{close_size}{Binary closing brush size used when \code{clean_mask = TRUE}.
+Use \code{1} to skip closing.}
+
+\item{open_size}{Binary opening brush size used when \code{clean_mask = TRUE}.
+Use \code{1} to skip opening.}
+
+\item{keep_largest}{Logical; keep only the largest connected component after
+area filtering when \code{clean_mask = TRUE}.}
 
 \item{mask_mode}{Mask fill mode passed to \code{mask_cube()}.}
 

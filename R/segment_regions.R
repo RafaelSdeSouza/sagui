@@ -12,6 +12,15 @@
 #' @param denoise_k Optional starlet denoising threshold.
 #' @param mode Thresholding mode for starlet reconstruction.
 #' @param positive_only Logical; keep only positive reconstruction values in the mask.
+#' @param clean_mask Logical; apply optional support-mask cleanup.
+#' @param min_mask_area Minimum connected-component area retained when
+#'   `clean_mask = TRUE`.
+#' @param close_size Binary closing brush size used when `clean_mask = TRUE`.
+#'   Use `1` to skip closing.
+#' @param open_size Binary opening brush size used when `clean_mask = TRUE`.
+#'   Use `1` to skip opening.
+#' @param keep_largest Logical; keep only the largest connected component after
+#'   area filtering when `clean_mask = TRUE`.
 #' @return A list with the collapsed image, decomposition, reconstruction, and logical mask.
 #' @export
 build_starlet_mask <- function(input,
@@ -22,7 +31,12 @@ build_starlet_mask <- function(input,
                                include_coarse = FALSE,
                                denoise_k = 2.5,
                                mode = c("soft", "hard"),
-                               positive_only = TRUE) {
+                               positive_only = TRUE,
+                               clean_mask = FALSE,
+                               min_mask_area = 1L,
+                               close_size = 1L,
+                               open_size = 1L,
+                               keep_largest = FALSE) {
   mode <- match.arg(mode)
   cube <- if (is.list(input) && !is.null(input$imDat)) input$imDat else input
   stopifnot(is.array(cube), length(dim(cube)) == 3L)
@@ -43,11 +57,19 @@ build_starlet_mask <- function(input,
     mask <- mask & reconstruction > 0
   }
 
-  list(
+  out <- list(
     collapsed = collapsed,
     decomposition = decomposition,
     reconstruction = reconstruction,
     mask = mask
+  )
+  .apply_mask_cleanup(
+    out,
+    clean_mask = clean_mask,
+    min_mask_area = min_mask_area,
+    close_size = close_size,
+    open_size = open_size,
+    keep_largest = keep_largest
   )
 }
 
@@ -123,6 +145,16 @@ build_starlet_mask <- function(input,
 #' @param denoise_k Optional starlet denoising threshold.
 #' @param mode Starlet thresholding mode.
 #' @param positive_only Logical; keep only positive reconstruction values in the mask.
+#' @param clean_mask Logical; apply optional support-mask cleanup after the
+#'   foreground support is built.
+#' @param min_mask_area Minimum connected-component area retained when
+#'   `clean_mask = TRUE`.
+#' @param close_size Binary closing brush size used when `clean_mask = TRUE`.
+#'   Use `1` to skip closing.
+#' @param open_size Binary opening brush size used when `clean_mask = TRUE`.
+#'   Use `1` to skip opening.
+#' @param keep_largest Logical; keep only the largest connected component after
+#'   area filtering when `clean_mask = TRUE`.
 #' @param mask_mode Mask fill mode passed to `mask_cube()`.
 #' @param hclust_method Linkage method passed to `hclust()`.
 #' @return A segmentation result list containing the cluster map, mask products, and metadata.
@@ -145,6 +177,11 @@ segment_regions <- function(input,
                             denoise_k = 2.5,
                             mode = c("soft", "hard"),
                             positive_only = TRUE,
+                            clean_mask = FALSE,
+                            min_mask_area = 1L,
+                            close_size = 1L,
+                            open_size = 1L,
+                            keep_largest = FALSE,
                             mask_mode = c("na", "zero"),
                             hclust_method = "ward.D2") {
   mode <- match.arg(mode)
@@ -181,7 +218,12 @@ segment_regions <- function(input,
         include_coarse = include_coarse,
         denoise_k = denoise_k,
         mode = mode,
-        positive_only = positive_only
+        positive_only = positive_only,
+        clean_mask = clean_mask,
+        min_mask_area = min_mask_area,
+        close_size = close_size,
+        open_size = open_size,
+        keep_largest = keep_largest
       )
     } else {
       contourlet_defaults <- list(
@@ -202,6 +244,14 @@ segment_regions <- function(input,
       mask_info <- do.call(
         build_contourlet_mask,
         utils::modifyList(contourlet_defaults, support_args)
+      )
+      mask_info <- .apply_mask_cleanup(
+        mask_info,
+        clean_mask = clean_mask,
+        min_mask_area = min_mask_area,
+        close_size = close_size,
+        open_size = open_size,
+        keep_largest = keep_largest
       )
     }
     spatial_mask <- mask_info$mask

@@ -13,7 +13,12 @@ build_starlet_mask(
   include_coarse = FALSE,
   denoise_k = 2.5,
   mode = c("soft", "hard"),
-  positive_only = TRUE
+  positive_only = TRUE,
+  clean_mask = FALSE,
+  min_mask_area = 1L,
+  close_size = 1L,
+  open_size = 1L,
+  keep_largest = FALSE
 )
 }
 \arguments{
@@ -37,6 +42,20 @@ than the original flux cube.}
 \item{mode}{Thresholding mode for starlet reconstruction.}
 
 \item{positive_only}{Logical; keep only positive reconstruction values in the mask.}
+
+\item{clean_mask}{Logical; apply optional support-mask cleanup.}
+
+\item{min_mask_area}{Minimum connected-component area retained when
+\code{clean_mask = TRUE}.}
+
+\item{close_size}{Binary closing brush size used when \code{clean_mask = TRUE}.
+Use \code{1} to skip closing.}
+
+\item{open_size}{Binary opening brush size used when \code{clean_mask = TRUE}.
+Use \code{1} to skip opening.}
+
+\item{keep_largest}{Logical; keep only the largest connected component after
+area filtering when \code{clean_mask = TRUE}.}
 }
 \value{
 A list with the collapsed image, decomposition, reconstruction, and logical mask.
