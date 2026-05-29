@@ -29,7 +29,7 @@ cube <- FITSio::readFITS("data/my_psfmatched_cube.fits")
 bands <- FITSio::axVec(3, cube$axDat)
 ```
 
-## What users see
+## Outputs
 
 The package outputs image-plane products and tables. The core visual outputs are
 a white image, a support mask, a segmentation map, and optional painted
@@ -85,7 +85,7 @@ plot_region_map(
 ![Example output from `plot_region_map()`: a 20-region SAGUI segmentation.](images/examples/sagui10_n20.png)
 :::
 
-## Sagui-10 main example
+## Sagui-10 example
 
 Sagui-10 is one of the main examples in the manuscript. The run below uses the
 same 20-region setup used for the segmentation comparison and for the regional
@@ -150,8 +150,7 @@ utils::write.csv(
 ```
 
 The long table is convenient for plotting and model fitting. The wide table is
-convenient for handing region fluxes to a student or to an external SED-fitting
-pipeline.
+convenient for handing region fluxes to an external SED-fitting pipeline.
 
 The same segmentation can be painted with properties from downstream SED
 fitting:
@@ -195,7 +194,7 @@ sed20$flux_long$flux_jy <- sed20$flux_long$flux * 1e-8
 sed20$flux_long$flux_err_jy <- sed20$flux_long$flux_err * 1e-8
 ```
 
-## Sagui-11 faint bridge
+## Sagui-11 faint merger bridge
 
 Sagui-11 is the merger example used in the low-surface-brightness section. The
 bridge is faint, so this is the useful place to compare the ordinary run with a
@@ -434,14 +433,3 @@ utils::write.csv(
 )
 ```
 
-## What to cite in a paper
-
-For a methods description, report at least:
-
-- cube units and whether the cube is PSF matched
-- starlet scales used for the support mask
-- number of output regions
-- clustering backend: exact Ward or sparse Ward
-- spectral pretransform, if any
-- whether errors came from a variance cube, sky MAD, or another model
-- whether fluxes are exported in native units or converted to Jy
