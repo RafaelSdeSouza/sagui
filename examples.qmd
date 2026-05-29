@@ -311,8 +311,8 @@ collapsed-image diagnostic, `cluster_snr`. The example below uses the regional
 SED table instead, because that is the quantity normally passed to the SED
 fitting stage.
 
-::: {.image-card .medium-image}
-![Example segmentation selected by the target S/N helper.](images/examples/sagui10_n20.png)
+::: {.image-card .wide-image}
+![Sagui-10 segmentations selected by target minimum regional S/N thresholds. Each panel reports the selected number of regions and the achieved minimum regional S/N.](images/examples/sagui10_target_snr_panel.png)
 :::
 
 ```r
