@@ -315,16 +315,14 @@ fitting stage.
 :::
 
 ```r
-target_snr <- 10
 ncomp_grid <- c(10, 15, 20, 30, 40, 60)
 
 seg_snr <- choose_ncomp_by_snr(
   input = cube,
-  target_snr = target_snr,
+  min_snr = 10,
   k_values = ncomp_grid,
   band_values = bands,
   backend = "sparse",
-  screen_stat = "min",
   use_starlet_mask = TRUE,
   starlet_J = 5,
   starlet_scales = 2:5,

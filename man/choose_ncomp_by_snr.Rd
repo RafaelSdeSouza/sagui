@@ -6,7 +6,10 @@
 \usage{
 choose_ncomp_by_snr(
   input,
-  target_snr,
+  min_snr = NULL,
+  min_SNR = NULL,
+  median_snr = NULL,
+  target_snr = NULL,
   var_cube = NULL,
   k_values = c(5, 10, 15, 20, 30, 40, 60),
   wavelength_range = NULL,
@@ -23,7 +26,16 @@ choose_ncomp_by_snr(
 \arguments{
 \item{input}{A 3-D array or FITS-like list with \code{imDat}.}
 
-\item{target_snr}{Numeric target regional S/N.}
+\item{min_snr}{Minimum regional S/N. This is the recommended user-facing
+argument.}
+
+\item{min_SNR}{Alias for \code{min_snr}, accepted for readability.}
+
+\item{median_snr}{Optional median regional S/N target. This is less strict
+than \code{min_snr}.}
+
+\item{target_snr}{Deprecated compatibility alias. Use \code{min_snr} or
+\code{median_snr}.}
 
 \item{var_cube}{Optional variance cube with the same dimensions as \code{input}.}
 
@@ -42,9 +54,8 @@ for the S/N calculation.}
 \item{snr_stat}{Either integrated S/N across the selected wavelengths or the
 median per-wavelength S/N.}
 
-\item{screen_stat}{Statistic used to screen a candidate segmentation. \code{"min"}
-requires every finite region to exceed \code{target_snr}; \code{"median"} requires
-the median regional S/N to exceed \code{target_snr}.}
+\item{screen_stat}{Deprecated compatibility option used only with
+\code{target_snr}. Prefer \code{min_snr} or \code{median_snr}.}
 
 \item{variance_inflation}{Multiplicative factor applied to propagated
 variances.}
@@ -59,12 +70,13 @@ or \code{\link[=segment_regions_large]{segment_regions_large()}}.}
 }
 \value{
 A SAGUI segmentation result for the selected number of regions. The result also
-contains \code{region_snr}, \code{snr_grid}, \code{target_snr}, and \code{snr_selection}
+contains \code{region_snr}, \code{snr_grid}, \code{snr_target}, and \code{snr_selection}
 entries.
 }
 \description{
 This helper runs SAGUI over a grid of candidate region counts and keeps the
-finest segmentation satisfying a target regional S/N cut. Unlike the quick
+finest segmentation satisfying a regional S/N cut. Use \code{min_snr} for the
+common case where every region must exceed a minimum S/N. Unlike the quick
 \code{cluster_snr} diagnostic returned by \code{\link[=segment_regions]{segment_regions()}},
 this function can evaluate the S/N from the flux-conserving regional SED table
 produced by \code{\link[=extract_region_sed]{extract_region_sed()}}.
