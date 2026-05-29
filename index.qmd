@@ -124,14 +124,14 @@ head(sed$flux_long)
 The `flux` column is the summed regional flux density. The table also includes
 `flux_err`, `n_eff`, `n_pix`, and the band wavelength when available.
 
-## Reproducing the manuscript examples
+## Mnuscript examples
 
 The manuscript focuses on the method and mathematical choices. Code examples
 are kept online so they can stay synchronized with the package interface.
 
 ::: {.example-strip}
 ::: {.example-card}
-### Sagui-10 main example
+### Sagui-10
 
 ![Sagui-10 20-region segmentation.](images/examples/sagui10_regions_sagui.png)
 
@@ -142,7 +142,7 @@ segmentation map and summed regional SEDs.
 :::
 
 ::: {.example-card}
-### Sagui-11 faint bridge
+### Sagui-11 faint merger bridge
 
 ![Sagui-11 low-surface-brightness merger composite from the manuscript.](images/examples/sagui11_lsb_composite.png)
 
@@ -204,17 +204,6 @@ products, metadata, and compatibility with `extract_region_sed()`.
 - Mask construction and clustering pretransforms are separate controls.
 - The package keeps manuscript examples online to avoid freezing fragile syntax
   into the paper body.
-
-## About and reproducibility
-
-`sagui` is the photometric counterpart to `capivara`. It keeps the idea of
-segmenting a cube by the information carried by each pixel, but it is designed
-for broadband and medium-band imaging data where each pixel contains a short
-photometric SED.
-
-The manuscript describes the method and assumptions. The website carries the
-code examples and visual outputs. This keeps the paper stable while allowing
-the package syntax to remain synchronized with the GitHub version.
 
 ## References
 
