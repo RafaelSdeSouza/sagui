@@ -300,7 +300,7 @@ large_sed <- extract_region_sed(
 ## Choosing the number of regions
 
 Here `Ncomp` is selected from a small grid. We keep the finest segmentation that
-still reaches the requested median regional S/N.
+still reaches the requested minimum regional S/N.
 
 The visual result is still a normal segmentation map; the S/N criterion only
 chooses how fine the map should be.
@@ -324,7 +324,7 @@ seg_snr <- choose_ncomp_by_snr(
   k_values = ncomp_grid,
   band_values = bands,
   backend = "sparse",
-  screen_stat = "median",
+  screen_stat = "min",
   use_starlet_mask = TRUE,
   starlet_J = 5,
   starlet_scales = 2:5,

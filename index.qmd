@@ -158,7 +158,7 @@ run with a copula-transformed run for the faint bridge and outskirts.
 ![Prospector-derived star-formation surface-density map painted back onto the segmentation.](images/examples/sagui10_sigma_sfr.png)
 
 Scan a few values of `Ncomp` and keep the finest segmentation that still meets
-a chosen median regional S/N.
+a chosen minimum regional S/N.
 
 [Open example](examples.html#choosing-the-number-of-regions)
 :::
