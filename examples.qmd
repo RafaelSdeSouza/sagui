@@ -314,26 +314,38 @@ fitting stage.
 ::: {.target-snr-grid}
 ::: {.target-snr-card}
 ![Sagui-10 segmentation selected with minimum regional S/N 5.](images/examples/target_snr/sagui10/sagui10_target_snr_05.png)
-**min S/N 5**  
-selected `Ncomp = 20`; achieved minimum S/N `5.8`
+
+<div class="target-snr-caption">
+<strong>min S/N 5</strong>
+<span>selected <code>Ncomp = 20</code>; achieved min S/N <code>5.8</code></span>
+</div>
 :::
 
 ::: {.target-snr-card}
 ![Sagui-10 segmentation selected with minimum regional S/N 10.](images/examples/target_snr/sagui10/sagui10_target_snr_10.png)
-**min S/N 10**  
-selected `Ncomp = 10`; achieved minimum S/N `10.5`
+
+<div class="target-snr-caption">
+<strong>min S/N 10</strong>
+<span>selected <code>Ncomp = 10</code>; achieved min S/N <code>10.5</code></span>
+</div>
 :::
 
 ::: {.target-snr-card}
 ![Sagui-10 segmentation selected with minimum regional S/N 15.](images/examples/target_snr/sagui10/sagui10_target_snr_15.png)
-**min S/N 15**  
-selected `Ncomp = 4`; achieved minimum S/N `19.7`
+
+<div class="target-snr-caption">
+<strong>min S/N 15</strong>
+<span>selected <code>Ncomp = 4</code>; achieved min S/N <code>19.7</code></span>
+</div>
 :::
 
 ::: {.target-snr-card}
 ![Sagui-10 segmentation selected with minimum regional S/N 20.](images/examples/target_snr/sagui10/sagui10_target_snr_20.png)
-**min S/N 20**  
-selected `Ncomp = 2`; achieved minimum S/N `47.1`
+
+<div class="target-snr-caption">
+<strong>min S/N 20</strong>
+<span>selected <code>Ncomp = 2</code>; achieved min S/N <code>47.1</code></span>
+</div>
 :::
 :::
 

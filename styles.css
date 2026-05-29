@@ -207,7 +207,7 @@ a:hover {
 .target-snr-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.8rem;
+  gap: 0.7rem;
   margin: 1rem 0 1.6rem 0;
 }
 
@@ -215,7 +215,7 @@ a:hover {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid var(--sagui-line);
   border-radius: 0.9rem;
-  padding: 0.65rem 0.65rem 0.75rem 0.65rem;
+  padding: 0.55rem 0.55rem 0.65rem 0.55rem;
   text-align: center;
   color: var(--sagui-blue);
   box-shadow: 0 10px 26px rgba(16, 32, 51, 0.05);
@@ -223,15 +223,50 @@ a:hover {
 
 .target-snr-card img {
   width: 100%;
-  max-width: 12rem;
+  max-width: 8.8rem;
   display: block;
-  margin: 0 auto 0.55rem auto;
+  margin: 0 auto 0.42rem auto;
 }
 
-.target-snr-card p {
+.target-snr-card figure,
+.target-snr-card .quarto-figure,
+.target-snr-card .quarto-figure-center {
   margin: 0;
-  font-size: 0.88rem;
-  line-height: 1.35;
+}
+
+.target-snr-card figcaption {
+  display: none;
+}
+
+.target-snr-card figure p {
+  margin: 0;
+}
+
+.target-snr-caption {
+  display: grid;
+  gap: 0.15rem;
+  justify-items: center;
+}
+
+.target-snr-caption strong {
+  color: var(--sagui-blue);
+}
+
+.target-snr-caption span {
+  color: var(--sagui-muted);
+}
+
+.target-snr-card p,
+.target-snr-caption {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.28;
+}
+
+.target-snr-caption p {
+  display: grid;
+  gap: 0.12rem;
+  justify-items: center;
 }
 
 .feature-card,
