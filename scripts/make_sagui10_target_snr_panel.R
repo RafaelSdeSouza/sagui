@@ -4,7 +4,6 @@ suppressPackageStartupMessages({
   library(FITSio)
   library(ggplot2)
   library(guara)
-  library(patchwork)
   library(ragg)
 })
 
@@ -14,8 +13,13 @@ crp_dir <- Sys.getenv(
   unset = "/Users/rd23aag/Documents/GitHub/crp8_segmentation"
 )
 
-out_dir <- file.path(repo_dir, "images", "examples")
-dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+web_out_dir <- file.path(repo_dir, "images", "examples", "target_snr", "sagui10")
+paper_out_dir <- Sys.getenv(
+  "SAGUI10_TARGET_SNR_PAPER_DIR",
+  unset = file.path(crp_dir, "results/figures/paper_repro/target_snr_selection/sagui10")
+)
+dir.create(web_out_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(paper_out_dir, recursive = TRUE, showWarnings = FALSE)
 
 cube_path <- Sys.getenv(
   "SAGUI10_PSF_CUBE",
@@ -47,23 +51,11 @@ palette_van_gogh_div <- function(n = 256) {
   grDevices::colorRampPalette(stops, space = "Lab")(n)
 }
 
-make_paper_theme <- function(base_size = 13) {
+make_clean_map_theme <- function(base_size = 13) {
   theme_void(base_size = base_size) +
     theme(
-      plot.title = element_text(
-        face = "bold",
-        colour = "#213E60",
-        hjust = 0.5,
-        size = rel(1.05),
-        margin = margin(b = 2)
-      ),
-      plot.subtitle = element_text(
-        colour = "#213E60",
-        hjust = 0.5,
-        size = rel(0.78),
-        margin = margin(b = 5)
-      ),
       legend.position = "none",
+      plot.margin = margin(0, 0, 0, 0),
       plot.background = element_rect(fill = "white", colour = NA),
       panel.background = element_rect(fill = "white", colour = NA)
     )
@@ -173,12 +165,12 @@ selection_table <- do.call(
 
 write.csv(
   candidate_table,
-  file.path(out_dir, "sagui10_target_snr_candidates.csv"),
+  file.path(web_out_dir, "sagui10_target_snr_candidates.csv"),
   row.names = FALSE
 )
 write.csv(
   selection_table,
-  file.path(out_dir, "sagui10_target_snr_selection.csv"),
+  file.path(web_out_dir, "sagui10_target_snr_selection.csv"),
   row.names = FALSE
 )
 
@@ -195,33 +187,31 @@ panel_plot <- function(target) {
     border_linewidth = 0.85,
     background_color = "white"
   ) +
-    labs(
-      title = sprintf("target S/N >= %s", target),
-      subtitle = sprintf(
-        "selected N = %d; achieved min S/N = %.1f",
-        item$Ncomp,
-        item$snr_min
-      )
-    ) +
-    make_paper_theme(base_size = 12)
+    make_clean_map_theme(base_size = 12)
 }
 
 panels <- lapply(targets, panel_plot)
 
 for (i in seq_along(targets)) {
-  target_path <- file.path(out_dir, sprintf("sagui10_target_snr_%02d.png", targets[i]))
-  ragg::agg_png(target_path, width = 3.3, height = 3.5, units = "in", res = 320, background = "white")
-  print(panels[[i]])
-  grDevices::dev.off()
+  file_name <- sprintf("sagui10_target_snr_%02d.png", targets[i])
+  for (target_path in c(file.path(web_out_dir, file_name), file.path(paper_out_dir, file_name))) {
+    ragg::agg_png(target_path, width = 3.0, height = 3.0, units = "in", res = 400, background = "white")
+    print(panels[[i]])
+    grDevices::dev.off()
+  }
 }
 
-combined <- wrap_plots(panels, nrow = 1) +
-  plot_annotation(theme = theme(plot.background = element_rect(fill = "white", colour = NA)))
+write.csv(
+  candidate_table,
+  file.path(paper_out_dir, "sagui10_target_snr_candidates.csv"),
+  row.names = FALSE
+)
+write.csv(
+  selection_table,
+  file.path(paper_out_dir, "sagui10_target_snr_selection.csv"),
+  row.names = FALSE
+)
 
-panel_path <- file.path(out_dir, "sagui10_target_snr_panel.png")
-ragg::agg_png(panel_path, width = 12.5, height = 3.7, units = "in", res = 320, background = "white")
-print(combined)
-grDevices::dev.off()
-
-message("Wrote: ", panel_path)
-message("Wrote: ", file.path(out_dir, "sagui10_target_snr_selection.csv"))
+message("Wrote clean website images to: ", web_out_dir)
+message("Wrote clean paper images to: ", paper_out_dir)
+message("Selection table: ", file.path(paper_out_dir, "sagui10_target_snr_selection.csv"))
