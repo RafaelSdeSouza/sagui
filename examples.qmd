@@ -296,10 +296,12 @@ large_sed <- extract_region_sed(
 )
 ```
 
-## Choosing the number of regions
+## Target S/N selection
 
-Here `Ncomp` is selected from a small grid. We keep the finest segmentation that
-still reaches the requested minimum regional S/N.
+Use `choose_ncomp_by_snr()` when you want SAGUI to choose the number of
+regions from a requested minimum regional S/N. The function returns a normal
+segmentation object, but the selected `Ncomp` is the finest value that still
+passes the S/N criterion.
 
 The visual result is still a normal segmentation map; the S/N criterion only
 chooses how fine the map should be.
@@ -310,16 +312,13 @@ SED table instead, because that is the quantity normally passed to the SED
 fitting stage.
 
 ::: {.image-card .medium-image}
-![Example segmentation that can be selected after scanning the target S/N grid.](images/examples/sagui10_n20.png)
+![Example segmentation selected by the target S/N helper.](images/examples/sagui10_n20.png)
 :::
 
 ```r
-ncomp_grid <- c(10, 15, 20, 30, 40, 60)
-
 seg_snr <- choose_ncomp_by_snr(
   input = cube,
   min_snr = 10,
-  k_values = ncomp_grid,
   band_values = bands,
   backend = "sparse",
   use_starlet_mask = TRUE,
@@ -335,8 +334,28 @@ seg_snr$Ncomp
 seg_snr$snr_grid
 ```
 
-This is a practical way to tune the region count: higher `Ncomp` gives finer
-spatial structure, but lower regional S/N.
+By default the helper tries a small set of candidate region counts. If you want
+to restrict the search to the values used in the paper, pass them explicitly:
+
+```r
+seg_snr <- choose_ncomp_by_snr(
+  input = cube,
+  min_snr = 10,
+  k_values = c(10, 15, 20, 30, 40, 60),
+  band_values = bands,
+  backend = "sparse",
+  use_starlet_mask = TRUE,
+  starlet_J = 5,
+  starlet_scales = 2:5,
+  cluster_pretransform = "copula_gaussian",
+  knn_k = 100,
+  auto_k = TRUE,
+  spatial_weight = 0.02
+)
+```
+
+This is a practical way to tune the region count without hand-picking `Ncomp`:
+higher `Ncomp` gives finer spatial structure, but lower regional S/N.
 
 If you only need a fast diagnostic, use the S/N values stored in the
 segmentation object:
@@ -432,4 +451,3 @@ utils::write.csv(
   row.names = FALSE
 )
 ```
-

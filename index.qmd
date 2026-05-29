@@ -153,14 +153,15 @@ run with a copula-transformed run for the faint bridge and outskirts.
 :::
 
 ::: {.example-card}
-### Choosing the number of regions
+### Target S/N selection
 
 ![Prospector-derived star-formation surface-density map painted back onto the segmentation.](images/examples/sagui10_sigma_sfr.png)
 
-Scan a few values of `Ncomp` and keep the finest segmentation that still meets
-a chosen minimum regional S/N.
+Use `choose_ncomp_by_snr(min_snr = ...)` to select the finest segmentation that
+still satisfies a minimum regional S/N. The candidate `Ncomp` values are only
+the discrete search space used by the wrapper.
 
-[Open example](examples.html#choosing-the-number-of-regions)
+[Open example](examples.html#target-sn-selection)
 :::
 
 ::: {.example-card}
