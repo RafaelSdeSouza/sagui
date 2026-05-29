@@ -2,6 +2,7 @@
 title: "Using SAGUI with Python"
 toc: true
 toc-depth: 2
+toc-location: left
 ---
 
 `sagui` runs in R. A clean way to use it in a Python workflow is to run the

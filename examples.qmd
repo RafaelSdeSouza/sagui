@@ -2,6 +2,7 @@
 title: "Examples"
 toc: true
 toc-depth: 2
+toc-location: left
 ---
 
 This page keeps the code-oriented material outside the frozen manuscript. The
@@ -317,61 +318,13 @@ fitting stage.
 target_snr <- 10
 ncomp_grid <- c(10, 15, 20, 30, 40, 60)
 
-score_ncomp <- function(ncomp, cube, bands, var_cube = NULL) {
-  seg <- segment_regions_large(
-    input = cube,
-    Ncomp = ncomp,
-    use_starlet_mask = TRUE,
-    starlet_J = 5,
-    starlet_scales = 2:5,
-    cluster_pretransform = "copula_gaussian",
-    knn_k = 100,
-    auto_k = TRUE,
-    spatial_weight = 0.02,
-    verbose = FALSE
-  )
-
-  sed <- extract_region_sed(
-    cube = cube,
-    labels = seg$cluster_map,
-    var_cube = var_cube,
-    band_values = bands,
-    error_fallback = if (is.null(var_cube)) "mad_sky" else "none"
-  )
-
-  good <- is.finite(sed$flux_long$flux_err) & sed$flux_long$flux_err > 0
-  snr <- abs(sed$flux_long$flux[good]) / sed$flux_long$flux_err[good]
-
-  data.frame(
-    Ncomp = ncomp,
-    median_snr = stats::median(snr, na.rm = TRUE),
-    q16_snr = stats::quantile(snr, 0.16, na.rm = TRUE),
-    q84_snr = stats::quantile(snr, 0.84, na.rm = TRUE)
-  )
-}
-
-snr_grid <- do.call(
-  rbind,
-  lapply(ncomp_grid, score_ncomp, cube = cube, bands = bands)
-)
-
-candidates <- subset(snr_grid, median_snr >= target_snr)
-
-chosen_ncomp <- if (nrow(candidates)) {
-  max(candidates$Ncomp)
-} else {
-  snr_grid$Ncomp[which.max(snr_grid$median_snr)]
-}
-
-chosen_ncomp
-```
-
-Run the selected segmentation:
-
-```r
-seg_snr <- segment_regions_large(
+seg_snr <- choose_ncomp_by_snr(
   input = cube,
-  Ncomp = chosen_ncomp,
+  target_snr = target_snr,
+  k_values = ncomp_grid,
+  band_values = bands,
+  backend = "sparse",
+  screen_stat = "median",
   use_starlet_mask = TRUE,
   starlet_J = 5,
   starlet_scales = 2:5,
@@ -380,6 +333,9 @@ seg_snr <- segment_regions_large(
   auto_k = TRUE,
   spatial_weight = 0.02
 )
+
+seg_snr$Ncomp
+seg_snr$snr_grid
 ```
 
 This is a practical way to tune the region count: higher `Ncomp` gives finer
