@@ -14,13 +14,16 @@ title: ""
     </div>
     <div class="hero-actions">
       <a class="hero-button hero-button-primary" href="#quick-start">Quick start</a>
-      <a class="hero-button" href="examples.html">Reproduce paper cases</a>
+      <a class="hero-button" href="examples.html">Paper cases</a>
+      <a class="hero-button" href="python.html">Python handoff</a>
       <a class="hero-button" href="https://github.com/RafaelSdeSouza/sagui">GitHub</a>
     </div>
   </div>
   <div class="hero-brand-logos">
     <img class="hero-logo" src="images/sagui_upscaled.png" alt="sagui logo" />
-    <img class="hero-preview" src="images/examples/sagui10_n20.png" alt="Sagui-10 segmentation example" />
+    <div class="hero-visual-card">
+      <img class="hero-preview" src="images/examples/sagui10_n20.png" alt="Sagui-10 segmentation example" width="320" height="320" />
+    </div>
     <div class="hero-affiliation">
       <img class="hero-note-logo" src="https://raw.githubusercontent.com/COINtoolbox/brand-assets/main/logo/COIN_2024_Logo.svg" alt="COIN logo" />
       <span>Part of the <strong>COIN Toolbox</strong></span>
@@ -158,6 +161,17 @@ Scan a few values of `Ncomp` and keep the finest segmentation that still meets
 a chosen median regional S/N.
 
 [Open example](examples.html#choosing-the-number-of-regions)
+:::
+
+::: {.example-card}
+### Python handoff
+
+![Example 20-region SAGUI segmentation for Sagui-10.](images/examples/sagui10_n20.png)
+
+Save regional SEDs as CSV and the label map as FITS, then read the products
+with `pandas` and `astropy`.
+
+[Open example](python.html)
 :::
 :::
 

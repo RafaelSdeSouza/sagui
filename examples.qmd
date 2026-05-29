@@ -304,6 +304,11 @@ still reaches the requested median regional S/N.
 The visual result is still a normal segmentation map; the S/N criterion only
 chooses how fine the map should be.
 
+`segment_regions()` and `segment_regions_large()` already return a quick
+collapsed-image diagnostic, `cluster_snr`. The example below uses the regional
+SED table instead, because that is the quantity normally passed to the SED
+fitting stage.
+
 ::: {.image-card .medium-image}
 ![Example segmentation that can be selected after scanning the target S/N grid.](images/examples/sagui10_n20.png)
 :::
@@ -380,10 +385,30 @@ seg_snr <- segment_regions_large(
 This is a practical way to tune the region count: higher `Ncomp` gives finer
 spatial structure, but lower regional S/N.
 
+If you only need a fast diagnostic, use the S/N values stored in the
+segmentation object:
+
+```r
+seg_fast <- segment_regions_large(
+  input = cube,
+  Ncomp = 20,
+  use_starlet_mask = TRUE,
+  starlet_J = 5,
+  starlet_scales = 2:5,
+  cluster_pretransform = "copula_gaussian",
+  knn_k = 100,
+  auto_k = TRUE,
+  spatial_weight = 0.02
+)
+
+stats::median(seg_fast$cluster_snr, na.rm = TRUE)
+```
+
 ## Export products
 
 The manuscript-style products are a segmentation map, long and wide region SED
-tables, and optional diagnostic images.
+tables, and optional diagnostic images. For a Python workflow, see the dedicated
+[Python handoff](python.html) page.
 
 ::: {.gallery-grid}
 ::: {.output-card}
@@ -425,8 +450,35 @@ print(plot_region_map(seg20, palette = sagui_palette, background_color = "white"
 dev.off()
 ```
 
-If you need FITS output, save `seg20$cluster_map` with your preferred FITS
-writer. The map is a 2D matrix of region labels with `NA` outside the support.
+Save the label map as FITS, using `0` outside the SAGUI support:
+
+```r
+label_map <- seg20$cluster_map
+label_map_out <- label_map
+label_map_out[is.na(label_map_out)] <- 0L
+storage.mode(label_map_out) <- "integer"
+
+fits_file <- file.path("outputs", "segmentation_map.fits")
+if (file.exists(fits_file)) file.remove(fits_file)
+FITSio::writeFITSim(label_map_out, file = fits_file, type = "integer")
+```
+
+Save a pixel-to-region CSV as a plain, language-independent fallback:
+
+```r
+region_pixels <- expand.grid(
+  x = seq_len(nrow(label_map)),
+  y = seq_len(ncol(label_map))
+)
+region_pixels$region <- as.vector(label_map)
+region_pixels <- subset(region_pixels, !is.na(region))
+
+utils::write.csv(
+  region_pixels,
+  file.path("outputs", "region_pixels.csv"),
+  row.names = FALSE
+)
+```
 
 ## What to cite in a paper
 

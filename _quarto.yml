@@ -8,6 +8,8 @@ website:
     left:
       - href: examples.qmd
         text: Examples
+      - href: python.qmd
+        text: Python
     right:
       - icon: github
         href: https://github.com/RafaelSdeSouza/sagui
@@ -19,4 +21,7 @@ format:
   html:
     theme: cosmo
     css: styles.css
+    include-in-header:
+      text: |
+        <link rel="stylesheet" href="styles.css?v=20260529c">
     toc: false
