@@ -6,10 +6,8 @@ website:
   title: "sagui"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
-      - href: about.qmd
-        text: About
+      - href: examples.qmd
+        text: Examples
     right:
       - icon: github
         href: https://github.com/RafaelSdeSouza/sagui
