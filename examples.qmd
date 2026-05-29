@@ -29,7 +29,7 @@ cube <- FITSio::readFITS("data/my_psfmatched_cube.fits")
 bands <- FITSio::axVec(3, cube$axDat)
 ```
 
-## Outputs
+## Data products
 
 The package outputs image-plane products and tables. The core visual outputs are
 a white image, a support mask, a segmentation map, and optional painted
