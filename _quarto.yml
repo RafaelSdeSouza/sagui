@@ -6,13 +6,16 @@ website:
   title: "sagui"
   navbar:
     left:
+      - href: index.qmd
+        text: Quick start
       - href: examples.qmd
-        text: Examples
+        text: Paper cases
       - href: python.qmd
-        text: Python
+        text: Python handoff
     right:
       - icon: github
         href: https://github.com/RafaelSdeSouza/sagui
+        text: GitHub
   page-footer:
     left: "Part of the COIN Toolbox"
     right: "Built with Quarto"
