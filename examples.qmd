@@ -311,8 +311,30 @@ collapsed-image diagnostic, `cluster_snr`. The example below uses the regional
 SED table instead, because that is the quantity normally passed to the SED
 fitting stage.
 
-::: {.image-card .wide-image}
-![Sagui-10 segmentations selected by target minimum regional S/N thresholds. Each panel reports the selected number of regions and the achieved minimum regional S/N.](images/examples/sagui10_target_snr_panel.png)
+::: {.target-snr-grid}
+::: {.target-snr-card}
+![Sagui-10 segmentation selected with minimum regional S/N 5.](images/examples/target_snr/sagui10/sagui10_target_snr_05.png)
+**min S/N 5**  
+selected `Ncomp = 20`; achieved minimum S/N `5.8`
+:::
+
+::: {.target-snr-card}
+![Sagui-10 segmentation selected with minimum regional S/N 10.](images/examples/target_snr/sagui10/sagui10_target_snr_10.png)
+**min S/N 10**  
+selected `Ncomp = 10`; achieved minimum S/N `10.5`
+:::
+
+::: {.target-snr-card}
+![Sagui-10 segmentation selected with minimum regional S/N 15.](images/examples/target_snr/sagui10/sagui10_target_snr_15.png)
+**min S/N 15**  
+selected `Ncomp = 4`; achieved minimum S/N `19.7`
+:::
+
+::: {.target-snr-card}
+![Sagui-10 segmentation selected with minimum regional S/N 20.](images/examples/target_snr/sagui10/sagui10_target_snr_20.png)
+**min S/N 20**  
+selected `Ncomp = 2`; achieved minimum S/N `47.1`
+:::
 :::
 
 ```r

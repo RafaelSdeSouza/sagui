@@ -204,6 +204,36 @@ a:hover {
   margin: 1.1rem 0 1.6rem 0;
 }
 
+.target-snr-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0 1.6rem 0;
+}
+
+.target-snr-card {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--sagui-line);
+  border-radius: 0.9rem;
+  padding: 0.65rem 0.65rem 0.75rem 0.65rem;
+  text-align: center;
+  color: var(--sagui-blue);
+  box-shadow: 0 10px 26px rgba(16, 32, 51, 0.05);
+}
+
+.target-snr-card img {
+  width: 100%;
+  max-width: 12rem;
+  display: block;
+  margin: 0 auto 0.55rem auto;
+}
+
+.target-snr-card p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
 .feature-card,
 .example-card {
   background: var(--sagui-card);
@@ -348,6 +378,16 @@ code {
   .feature-grid,
   .example-strip,
   .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .target-snr-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .target-snr-grid {
     grid-template-columns: 1fr;
   }
 }
