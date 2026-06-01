@@ -152,12 +152,14 @@ utils::write.csv(
 The long table is convenient for plotting and model fitting. The wide table is
 convenient for handing region fluxes to an external SED-fitting pipeline.
 
-The same segmentation can be painted with properties from downstream SED
-fitting:
+The same regional photometry can be passed to downstream SED-fitting tools. The
+SED panel below shows a compact Bagpipes diagnostic fit for one Sagui-8 region,
+generated from the flux-preserving regional table. The map panel shows an
+example physical-property map painted back onto a SAGUI segmentation.
 
 ::: {.gallery-grid}
 ::: {.output-card}
-![Prospector SED fit for one segmented region.](images/examples/sagui10_sedfit_region_1.png)
+![Bagpipes SED fit for Sagui-8 region 8, using SAGUI regional photometry.](images/examples/sagui8_region8_bagpipes_sedfit.png)
 
 **SED fit**
 :::

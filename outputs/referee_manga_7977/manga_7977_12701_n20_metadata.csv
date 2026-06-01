@@ -1,0 +1,2 @@
+"plateifu","Ncomp_requested","Ncomp_returned","valid_spaxels","mask_spaxels","backend","knn_k","feature_scale","spatial_weight"
+"7977-12701",20,20,817,817,"sparse_ward",50,"robust_col",0.06
