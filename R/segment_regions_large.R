@@ -152,7 +152,7 @@ segment_regions_large <- function(input,
                                   scale_fn = median_scale,
                                   n_regions = NULL,
                                   use_starlet_mask = TRUE,
-                                  support_method = c("starlet", "starlet_contourlet", "contourlet"),
+                                  support_method = c("starlet", "adaptive", "starlet_contourlet", "contourlet"),
                                   support_args = list(),
                                   collapse_fn = collapse_white_light,
                                   starlet_J = 5,
@@ -214,6 +214,26 @@ segment_regions_large <- function(input,
         denoise_k = denoise_k,
         mode = mode,
         positive_only = positive_only,
+        clean_mask = clean_mask,
+        min_mask_area = min_mask_area,
+        close_size = close_size,
+        open_size = open_size,
+        keep_largest = keep_largest
+      )
+    } else if (support_method == "adaptive") {
+      adaptive_defaults <- list(
+        input = cubedat,
+        pretransform = mask_pretransform
+      )
+      if (!is.list(support_args)) {
+        stop("`support_args` must be a named list.")
+      }
+      mask_info <- do.call(
+        build_adaptive_support,
+        utils::modifyList(adaptive_defaults, support_args)
+      )
+      mask_info <- .apply_mask_cleanup(
+        mask_info,
         clean_mask = clean_mask,
         min_mask_area = min_mask_area,
         close_size = close_size,

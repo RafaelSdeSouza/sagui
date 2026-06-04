@@ -14,7 +14,7 @@ segment_regions(
   scale_fn = median_scale,
   n_regions = NULL,
   use_starlet_mask = TRUE,
-  support_method = c("starlet", "starlet_contourlet", "contourlet"),
+  support_method = c("starlet", "adaptive", "starlet_contourlet", "contourlet"),
   support_args = list(),
   collapse_fn = collapse_white_light,
   starlet_J = 5,
@@ -62,11 +62,14 @@ clustering. Use \code{identity} for no row scaling.}
 
 \item{support_method}{Foreground support builder used when
 \code{use_starlet_mask = TRUE}. Options are \code{"starlet"} (default),
-\code{"starlet_contourlet"} (recommended directional refinement), and
-\code{"contourlet"} (standalone directional support; more experimental).}
+\code{"adaptive"} (multi-band statistical support), \code{"starlet_contourlet"}
+(directional refinement), and \code{"contourlet"} (standalone directional
+support; more experimental).}
 
-\item{support_args}{Optional named list passed to \code{\link[=build_contourlet_mask]{build_contourlet_mask()}}
-when \code{support_method} is not \code{"starlet"}.}
+\item{support_args}{Optional named list passed to the selected support
+builder. For \code{"adaptive"}, arguments are passed to
+\code{\link[=build_adaptive_support]{build_adaptive_support()}}. For contourlet methods, arguments are passed to
+\code{\link[=build_contourlet_mask]{build_contourlet_mask()}}.}
 
 \item{collapse_fn}{Function used to collapse the cube to a 2-D image.}
 
