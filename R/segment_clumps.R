@@ -159,21 +159,40 @@ detect_sed_clumps <- function(score,
 #' @param clump_seeds Data frame with `clump_id`, `row`, and `col`.
 #' @param support Logical foreground support mask.
 #' @param score Optional score map used to trim each local footprint.
+#' @param brightness Optional local-brightness/contrast map used by connected
+#'   footprints to stop growth once pixels fall back to the local background.
 #' @param grow_radius Initial dilation radius around each seed.
 #' @param max_radius Maximum radius tried when a clump is too small.
 #' @param min_pixels Minimum footprint size per clump.
 #' @param footprint_quantile Optional local score quantile used to keep only
 #'   the stronger part of each dilated footprint. Use `NULL` to keep all pixels.
+#' @param core_drop_frac For `footprint_mode = "connected"`, keep connected
+#'   pixels above this fraction of the seed-core brightness contrast relative to
+#'   the local background.
+#' @param sigma_threshold For `footprint_mode = "connected"`, keep connected
+#'   pixels above this robust local-background significance threshold. Use
+#'   `NULL` to disable.
+#' @param footprint_mode Footprint-growth mode. `"connected"` uses the seed only
+#'   as an anchor and returns the connected high-score component, allowing
+#'   elongated or irregular clump shapes. `"radial"` keeps compact radius-based
+#'   growth.
+#' @param connectivity Pixel connectivity used by `footprint_mode = "connected"`.
 #'
 #' @return A list with `clump_labels` and `footprint_summary`.
 #' @export
 grow_clump_footprints <- function(clump_seeds,
                                   support,
                                   score = NULL,
+                                  brightness = NULL,
                                   grow_radius = 3L,
                                   max_radius = 7L,
                                   min_pixels = 9L,
-                                  footprint_quantile = 0.10) {
+                                  footprint_quantile = 0.10,
+                                  core_drop_frac = 0.20,
+                                  sigma_threshold = 3,
+                                  footprint_mode = c("connected", "radial"),
+                                  connectivity = 8L) {
+  footprint_mode <- match.arg(footprint_mode)
   if (!is.matrix(support)) stop("`support` must be a matrix.")
   support <- is.finite(support) & support
   labels <- matrix(NA_integer_, nrow = nrow(support), ncol = ncol(support))
@@ -194,20 +213,37 @@ grow_clump_footprints <- function(clump_seeds,
     pix <- clump_seeds[clump_seeds$clump_id == id, , drop = FALSE]
     radius <- max(0L, as.integer(grow_radius))
     local <- matrix(FALSE, nrow = nrow(support), ncol = ncol(support))
-    repeat {
-      local <- .clump_dilate_points(pix, dim(support), radius = radius)
-      local <- local & support & !is.finite(labels)
-      if (!is.null(score) && !is.null(footprint_quantile) && any(local, na.rm = TRUE)) {
-        q <- stats::quantile(score[local], probs = footprint_quantile, na.rm = TRUE, names = FALSE)
-        if (is.finite(q)) {
-          trimmed <- local & is.finite(score) & score >= q
-          if (sum(trimmed, na.rm = TRUE) >= min_pixels || radius >= max_radius) {
-            local <- trimmed
+
+    if (footprint_mode == "connected" && !is.null(score)) {
+      local <- .clump_connected_seed_region(
+        points = pix,
+        support = support & !is.finite(labels),
+        score = score,
+        brightness = brightness,
+        search_radius = max_radius,
+        threshold_quantile = footprint_quantile,
+        core_drop_frac = core_drop_frac,
+        sigma_threshold = sigma_threshold,
+        min_pixels = min_pixels,
+        connectivity = connectivity
+      )
+      radius <- max_radius
+    } else {
+      repeat {
+        local <- .clump_dilate_points(pix, dim(support), radius = radius)
+        local <- local & support & !is.finite(labels)
+        if (!is.null(score) && !is.null(footprint_quantile) && any(local, na.rm = TRUE)) {
+          q <- stats::quantile(score[local], probs = footprint_quantile, na.rm = TRUE, names = FALSE)
+          if (is.finite(q)) {
+            trimmed <- local & is.finite(score) & score >= q
+            if (sum(trimmed, na.rm = TRUE) >= min_pixels || radius >= max_radius) {
+              local <- trimmed
+            }
           }
         }
+        if (sum(local, na.rm = TRUE) >= min_pixels || radius >= max_radius) break
+        radius <- radius + 1L
       }
-      if (sum(local, na.rm = TRUE) >= min_pixels || radius >= max_radius) break
-      radius <- radius + 1L
     }
     if (!any(local, na.rm = TRUE)) next
 
@@ -217,6 +253,7 @@ grow_clump_footprints <- function(clump_seeds,
       clump_id = next_id,
       n_pix = sum(local, na.rm = TRUE),
       grow_radius = radius,
+      footprint_mode = footprint_mode,
       stringsAsFactors = FALSE
     )
     next_id <- next_id + 1L
@@ -414,6 +451,16 @@ clump_evidence_table <- function(clump_labels,
 #' @param max_radius Maximum clump-footprint growth radius.
 #' @param min_pixels Minimum pixels per grown clump footprint.
 #' @param footprint_quantile Local score quantile used to trim grown footprints.
+#' @param core_drop_frac For connected footprints, keep connected pixels above
+#'   this fraction of the seed-core brightness contrast relative to the local
+#'   background.
+#' @param sigma_threshold For connected footprints, keep connected pixels above
+#'   this robust local-background significance threshold. Use `NULL` to disable.
+#' @param footprint_mode Footprint-growth mode. `"connected"` uses the seed only
+#'   as an anchor and returns the connected high-score component, allowing
+#'   elongated or irregular clump shapes. `"radial"` keeps the older compact
+#'   radius-based growth.
+#' @param connectivity Pixel connectivity used by `footprint_mode = "connected"`.
 #' @param contrast_weight Weight of compact local contrast in the clump score.
 #' @param sed_weight Weight of local SED anomaly in the clump score.
 #' @param small_sigma Compact smoothing scale for the clump score.
@@ -452,6 +499,10 @@ segment_clumps <- function(input,
                            max_radius = 7L,
                            min_pixels = 9L,
                            footprint_quantile = 0.10,
+                           core_drop_frac = 0.20,
+                           sigma_threshold = 3,
+                           footprint_mode = c("connected", "radial"),
+                           connectivity = 8L,
                            contrast_weight = 0.5,
                            sed_weight = 0.5,
                            small_sigma = 0.7,
@@ -475,6 +526,7 @@ segment_clumps <- function(input,
                            cluster_pretransform = "none",
                            verbose = TRUE) {
   feature_scale <- match.arg(feature_scale)
+  footprint_mode <- match.arg(footprint_mode)
   cubedat <- if (is.list(input) && !is.null(input$imDat)) {
     input
   } else {
@@ -539,10 +591,15 @@ segment_clumps <- function(input,
     clump_seeds = clump_seeds,
     support = support,
     score = score_info$score,
+    brightness = score_info$contrast,
     grow_radius = grow_radius,
     max_radius = max_radius,
     min_pixels = min_pixels,
-    footprint_quantile = footprint_quantile
+    footprint_quantile = footprint_quantile,
+    core_drop_frac = core_drop_frac,
+    sigma_threshold = sigma_threshold,
+    footprint_mode = footprint_mode,
+    connectivity = connectivity
   )
   clump_quality <- clump_evidence_table(
     clump_labels = footprints$clump_labels,
@@ -640,6 +697,10 @@ segment_clumps <- function(input,
       n_clump_seed_pixels = nrow(clump_seeds),
       n_clump_regions = n_clump_regions,
       clump_levels = clump_levels,
+      footprint_mode = footprint_mode,
+      core_drop_frac = core_drop_frac,
+      sigma_threshold = sigma_threshold,
+      connectivity = connectivity,
       apply_quality_filter = apply_quality_filter,
       min_peak_score = min_peak_score,
       min_median_score = min_median_score,
@@ -790,6 +851,141 @@ plot_clump_diagnostics <- function(x,
     }
   }
   mask
+}
+
+.clump_connected_seed_region <- function(points,
+                                         support,
+                                         score,
+                                         brightness = NULL,
+                                         search_radius = 7L,
+                                         threshold_quantile = 0.10,
+                                         core_drop_frac = 0.20,
+                                         sigma_threshold = 3,
+                                         min_pixels = 9L,
+                                         connectivity = 8L) {
+  support <- is.finite(support) & support
+  score <- as.matrix(score)
+  if (is.null(brightness)) brightness <- score
+  brightness <- as.matrix(brightness)
+  search_radius <- max(0L, as.integer(search_radius))
+  min_pixels <- max(1L, as.integer(min_pixels))
+
+  local_window <- .clump_dilate_points(points, dim(support), radius = search_radius)
+  candidate <- local_window & support & is.finite(score) & is.finite(brightness)
+  if (!any(candidate, na.rm = TRUE)) {
+    return(matrix(FALSE, nrow = nrow(support), ncol = ncol(support)))
+  }
+
+  core_mask <- .clump_dilate_points(points, dim(support), radius = 1L) & candidate
+  if (!any(core_mask, na.rm = TRUE)) core_mask <- candidate
+  bg_mask <- candidate & !core_mask
+  bg_values <- brightness[bg_mask]
+  if (!length(bg_values) || !any(is.finite(bg_values))) bg_values <- brightness[candidate]
+  bg <- stats::median(bg_values, na.rm = TRUE)
+  sig <- stats::mad(bg_values, center = bg, constant = 1.4826, na.rm = TRUE)
+  if (!is.finite(sig) || sig <= 0) sig <- stats::sd(bg_values, na.rm = TRUE)
+  if (!is.finite(sig) || sig <= 0) sig <- 0
+
+  core <- max(brightness[core_mask], na.rm = TRUE)
+  if (!is.finite(core)) core <- max(brightness[candidate], na.rm = TRUE)
+  if (!is.finite(bg)) bg <- min(brightness[candidate], na.rm = TRUE)
+  core_drop_frac <- as.numeric(core_drop_frac)
+  if (!is.finite(core_drop_frac)) core_drop_frac <- 0
+  core_drop_frac <- pmin(1, pmax(0, core_drop_frac))
+  drop_cut <- bg + core_drop_frac * max(0, core - bg)
+  sigma_cut <- -Inf
+  if (!is.null(sigma_threshold)) {
+    sigma_threshold <- as.numeric(sigma_threshold)
+    if (is.finite(sigma_threshold) && sig > 0) {
+      sigma_cut <- bg + sigma_threshold * sig
+    }
+  }
+  brightness_cut <- max(drop_cut, sigma_cut, na.rm = TRUE)
+
+  q_grid <- c(threshold_quantile, 0.25, 0.15, 0.05, 0)
+  q_grid <- unique(pmin(1, pmax(0, q_grid[is.finite(q_grid)])))
+  q_grid <- q_grid[order(q_grid, decreasing = TRUE)]
+  if (!length(q_grid)) q_grid <- 0
+
+  best <- matrix(FALSE, nrow = nrow(support), ncol = ncol(support))
+  best_n <- 0L
+  cut_grid <- unique(c(brightness_cut, drop_cut, bg + 1.5 * sig, bg))
+  cut_grid <- cut_grid[is.finite(cut_grid)]
+  cut_grid <- cut_grid[order(cut_grid, decreasing = TRUE)]
+  if (!length(cut_grid)) cut_grid <- -Inf
+
+  for (bcut in cut_grid) {
+    for (qprob in q_grid) {
+      q <- stats::quantile(score[candidate], probs = qprob, na.rm = TRUE, names = FALSE)
+      if (!is.finite(q)) next
+      high <- candidate & score >= q & brightness >= bcut
+      component <- .clump_seed_component(high, points, connectivity = connectivity)
+      n_component <- sum(component, na.rm = TRUE)
+      if (n_component > best_n) {
+        best <- component
+        best_n <- n_component
+      }
+      if (n_component >= min_pixels) return(component)
+    }
+  }
+
+  best
+}
+
+.clump_seed_component <- function(mask, points, connectivity = 8L) {
+  mask <- is.finite(mask) & mask
+  out <- matrix(FALSE, nrow = nrow(mask), ncol = ncol(mask))
+  if (!any(mask, na.rm = TRUE)) return(out)
+
+  seeds <- unique(data.frame(
+    row = as.integer(points$row),
+    col = as.integer(points$col)
+  ))
+  seeds <- seeds[
+    seeds$row >= 1L & seeds$row <= nrow(mask) &
+      seeds$col >= 1L & seeds$col <= ncol(mask),
+    ,
+    drop = FALSE
+  ]
+  if (!nrow(seeds)) return(out)
+
+  seed_mask <- matrix(FALSE, nrow = nrow(mask), ncol = ncol(mask))
+  seed_mask[cbind(seeds$row, seeds$col)] <- TRUE
+  if (!any(seed_mask & mask, na.rm = TRUE)) {
+    candidates <- which(mask, arr.ind = TRUE)
+    d2 <- vapply(seq_len(nrow(candidates)), function(i) {
+      min((seeds$row - candidates[i, 1])^2 + (seeds$col - candidates[i, 2])^2)
+    }, numeric(1))
+    closest <- candidates[which.min(d2), , drop = FALSE]
+    seed_mask[,] <- FALSE
+    seed_mask[closest[1, 1], closest[1, 2]] <- TRUE
+  }
+
+  frontier <- which(seed_mask & mask)
+  out[frontier] <- TRUE
+  offsets <- if (as.integer(connectivity) == 4L) {
+    rbind(c(-1L, 0L), c(1L, 0L), c(0L, -1L), c(0L, 1L))
+  } else {
+    as.matrix(expand.grid(dr = -1L:1L, dc = -1L:1L))[c(-5L), , drop = FALSE]
+  }
+
+  q <- frontier
+  head <- 1L
+  while (head <= length(q)) {
+    idx <- q[[head]]
+    head <- head + 1L
+    pos <- arrayInd(idx, .dim = dim(mask))
+    for (k in seq_len(nrow(offsets))) {
+      rr <- pos[1] + offsets[k, 1]
+      cc <- pos[2] + offsets[k, 2]
+      if (rr < 1L || rr > nrow(mask) || cc < 1L || cc > ncol(mask)) next
+      if (!mask[rr, cc] || out[rr, cc]) next
+      out[rr, cc] <- TRUE
+      q <- c(q, rr + (cc - 1L) * nrow(mask))
+    }
+  }
+
+  out
 }
 
 .clump_normalize_seed_table <- function(seeds, dims) {
