@@ -282,6 +282,108 @@ segment_clump_profiles <- function(clump_labels,
   )
 }
 
+#' Summarise evidence for candidate clumps
+#'
+#' @description
+#' Builds a compact evidence table for candidate clump footprints. A candidate
+#' is marked as accepted when it is spatially resolved and has sufficient local
+#' compactness and local SED-anomaly evidence.
+#'
+#' @param clump_labels Integer clump-footprint matrix.
+#' @param score_info Result from [compute_clump_score()].
+#' @param min_pixels Minimum number of pixels in a clump footprint.
+#' @param min_peak_score Minimum peak combined clump score. Use `NULL` to skip.
+#' @param min_median_score Minimum median combined clump score. Use `NULL` to skip.
+#' @param min_peak_contrast Minimum peak local-contrast score. Use `NULL` to skip.
+#' @param min_peak_sed_anomaly Minimum peak local SED-anomaly score. Use `NULL` to skip.
+#' @param high_score_threshold Threshold used to count high-score pixels.
+#' @param min_high_score_pixels Minimum number of pixels above `high_score_threshold`.
+#' @param probable_peak_score,probable_peak_contrast,probable_peak_sed_anomaly
+#'   Looser thresholds used to mark candidates as `"probable"` clumps.
+#'
+#' @return A data frame with clump evidence metrics, `quality`, and `accepted`.
+#' @export
+clump_evidence_table <- function(clump_labels,
+                                 score_info,
+                                 min_pixels = 9L,
+                                 min_peak_score = 0.35,
+                                 min_median_score = NULL,
+                                 min_peak_contrast = 0.15,
+                                 min_peak_sed_anomaly = 0.15,
+                                 high_score_threshold = 0.35,
+                                 min_high_score_pixels = 3L,
+                                 probable_peak_score = 0.15,
+                                 probable_peak_contrast = 0.15,
+                                 probable_peak_sed_anomaly = 0.10) {
+  if (!is.matrix(clump_labels)) stop("`clump_labels` must be a matrix.")
+  required <- c("score", "contrast", "sed_anomaly")
+  if (!all(required %in% names(score_info))) {
+    stop("`score_info` must be returned by `compute_clump_score()`.", call. = FALSE)
+  }
+
+  ids <- sort(unique(clump_labels[is.finite(clump_labels) & clump_labels > 0]))
+  if (!length(ids)) {
+    return(data.frame(
+      clump_id = integer(), n_pix = integer(), peak_score = numeric(),
+      median_score = numeric(), peak_contrast = numeric(),
+      median_contrast = numeric(), peak_sed_anomaly = numeric(),
+      median_sed_anomaly = numeric(), n_high_score = integer(),
+      accepted = logical()
+    ))
+  }
+
+  rows <- lapply(ids, function(id) {
+    idx <- which(clump_labels == id)
+    score <- score_info$score[idx]
+    contrast <- score_info$contrast[idx]
+    sed_anomaly <- score_info$sed_anomaly[idx]
+    data.frame(
+      clump_id = as.integer(id),
+      n_pix = length(idx),
+      peak_score = max(score, na.rm = TRUE),
+      median_score = stats::median(score, na.rm = TRUE),
+      peak_contrast = max(contrast, na.rm = TRUE),
+      median_contrast = stats::median(contrast, na.rm = TRUE),
+      peak_sed_anomaly = max(sed_anomaly, na.rm = TRUE),
+      median_sed_anomaly = stats::median(sed_anomaly, na.rm = TRUE),
+      n_high_score = sum(is.finite(score) & score >= high_score_threshold),
+      stringsAsFactors = FALSE
+    )
+  })
+  out <- do.call(rbind, rows)
+
+  strong <- out$n_pix >= max(1L, as.integer(min_pixels))
+  if (!is.null(min_peak_score)) {
+    strong <- strong & out$peak_score >= as.numeric(min_peak_score)
+  }
+  if (!is.null(min_median_score)) {
+    strong <- strong & out$median_score >= as.numeric(min_median_score)
+  }
+  if (!is.null(min_peak_contrast)) {
+    strong <- strong & out$peak_contrast >= as.numeric(min_peak_contrast)
+  }
+  if (!is.null(min_peak_sed_anomaly)) {
+    strong <- strong & out$peak_sed_anomaly >= as.numeric(min_peak_sed_anomaly)
+  }
+  if (!is.null(min_high_score_pixels)) {
+    strong <- strong & out$n_high_score >= max(1L, as.integer(min_high_score_pixels))
+  }
+
+  probable <- out$n_pix >= max(1L, as.integer(min_pixels)) &
+    out$peak_score >= as.numeric(probable_peak_score) &
+    (
+      out$peak_contrast >= as.numeric(probable_peak_contrast) |
+        out$peak_sed_anomaly >= as.numeric(probable_peak_sed_anomaly)
+    )
+
+  out$quality <- "weak"
+  out$quality[probable & !is.na(probable)] <- "probable"
+  out$quality[strong & !is.na(strong)] <- "strong"
+  out$quality <- factor(out$quality, levels = c("strong", "probable", "weak"))
+  out$accepted <- out$quality %in% c("strong", "probable")
+  out
+}
+
 #' Segment compact SED clumps and the diffuse galaxy body
 #'
 #' @description
@@ -316,6 +418,14 @@ segment_clump_profiles <- function(clump_labels,
 #' @param sed_weight Weight of local SED anomaly in the clump score.
 #' @param small_sigma Compact smoothing scale for the clump score.
 #' @param large_sigma Background smoothing scale for the clump score.
+#' @param apply_quality_filter Logical; if `TRUE`, discard candidate clumps that
+#'   fail the evidence cuts before profile splitting.
+#' @param min_peak_score,min_median_score,min_peak_contrast,min_peak_sed_anomaly
+#'   Evidence cuts passed to [clump_evidence_table()].
+#' @param high_score_threshold,min_high_score_pixels High-score-pixel criterion
+#'   passed to [clump_evidence_table()].
+#' @param probable_peak_score,probable_peak_contrast,probable_peak_sed_anomaly
+#'   Looser evidence thresholds used for `"probable"` clumps.
 #' @param body_segment Logical; segment the remaining diffuse body.
 #' @param knn_k,auto_k,max_k,feature_scale,spatial_weight Sparse-Ward arguments
 #'   passed to [segment_regions_large()] for the diffuse body.
@@ -346,6 +456,16 @@ segment_clumps <- function(input,
                            sed_weight = 0.5,
                            small_sigma = 0.7,
                            large_sigma = 4,
+                           apply_quality_filter = FALSE,
+                           min_peak_score = 0.35,
+                           min_median_score = NULL,
+                           min_peak_contrast = 0.15,
+                           min_peak_sed_anomaly = 0.15,
+                           high_score_threshold = 0.35,
+                           min_high_score_pixels = 3L,
+                           probable_peak_score = 0.15,
+                           probable_peak_contrast = 0.15,
+                           probable_peak_sed_anomaly = 0.10,
                            body_segment = TRUE,
                            knn_k = 40,
                            auto_k = FALSE,
@@ -424,6 +544,46 @@ segment_clumps <- function(input,
     min_pixels = min_pixels,
     footprint_quantile = footprint_quantile
   )
+  clump_quality <- clump_evidence_table(
+    clump_labels = footprints$clump_labels,
+    score_info = score_info,
+    min_pixels = min_pixels,
+    min_peak_score = min_peak_score,
+    min_median_score = min_median_score,
+    min_peak_contrast = min_peak_contrast,
+    min_peak_sed_anomaly = min_peak_sed_anomaly,
+    high_score_threshold = high_score_threshold,
+    min_high_score_pixels = min_high_score_pixels,
+    probable_peak_score = probable_peak_score,
+    probable_peak_contrast = probable_peak_contrast,
+    probable_peak_sed_anomaly = probable_peak_sed_anomaly
+  )
+  if (nrow(clump_quality)) {
+    footprints$footprint_summary <- merge(
+      footprints$footprint_summary,
+      clump_quality,
+      by = "clump_id",
+      all.x = TRUE,
+      sort = FALSE
+    )
+  }
+  if (isTRUE(apply_quality_filter) && nrow(clump_quality)) {
+    keep_ids <- clump_quality$clump_id[
+      isTRUE(clump_quality$accepted) | (clump_quality$accepted & !is.na(clump_quality$accepted))
+    ]
+    if (verbose) {
+      message("Keeping ", length(keep_ids), " clump candidate(s) after evidence cuts.")
+    }
+    drop <- is.finite(footprints$clump_labels) &
+      footprints$clump_labels > 0 &
+      !footprints$clump_labels %in% keep_ids
+    footprints$clump_labels[drop] <- NA_integer_
+    footprints$footprint_summary <- footprints$footprint_summary[
+      footprints$footprint_summary$clump_id %in% keep_ids,
+      ,
+      drop = FALSE
+    ]
+  }
   profiles <- segment_clump_profiles(
     clump_labels = footprints$clump_labels,
     score = score_info$score,
@@ -468,6 +628,7 @@ segment_clumps <- function(input,
     support = list(method = "clump", details = support_info),
     clump_score = score_info,
     clump_seeds = clump_seeds,
+    clump_quality = clump_quality,
     clump_footprints = footprints,
     clump_profiles = profiles,
     body_segmentation = body_seg,
@@ -479,6 +640,16 @@ segment_clumps <- function(input,
       n_clump_seed_pixels = nrow(clump_seeds),
       n_clump_regions = n_clump_regions,
       clump_levels = clump_levels,
+      apply_quality_filter = apply_quality_filter,
+      min_peak_score = min_peak_score,
+      min_median_score = min_median_score,
+      min_peak_contrast = min_peak_contrast,
+      min_peak_sed_anomaly = min_peak_sed_anomaly,
+      high_score_threshold = high_score_threshold,
+      min_high_score_pixels = min_high_score_pixels,
+      probable_peak_score = probable_peak_score,
+      probable_peak_contrast = probable_peak_contrast,
+      probable_peak_sed_anomaly = probable_peak_sed_anomaly,
       bands = bands,
       feature_scale = feature_scale,
       spatial_weight = spatial_weight,
@@ -514,12 +685,16 @@ plot_clump_diagnostics <- function(x,
     return(.clump_plot_labels(x$cluster_map, muted_body = FALSE))
   }
   if (mode == "profiles") {
-    return(.clump_plot_labels(x$clump_profiles$profile_labels, muted_body = FALSE))
+    return(.clump_plot_profile_labels(
+      labels = x$clump_profiles$profile_labels,
+      summary = x$clump_profiles$summary
+    ))
   }
 
   .clump_plot_overlay(
     scalar = x$clump_score$score,
     labels = x$clump_profiles$profile_labels,
+    summary = x$clump_profiles$summary,
     alpha = alpha
   )
 }
@@ -675,7 +850,52 @@ plot_clump_diagnostics <- function(x,
     )
 }
 
-.clump_plot_overlay <- function(scalar, labels, alpha = 0.72) {
+.clump_profile_region_colors <- function(summary) {
+  if (is.null(summary) || !nrow(summary) ||
+      !all(c("clump_id", "profile_level", "profile_region") %in% names(summary))) {
+    return(character())
+  }
+  clump_ids <- sort(unique(summary$clump_id))
+  base_cols <- grDevices::colorRampPalette(c(
+    "#213E60", "#E68C3A", "#66A7B0", "#D65F59", "#E7C55D", "#315C91"
+  ))(max(2L, length(clump_ids)))
+  names(base_cols) <- as.character(clump_ids)
+
+  cols <- character(nrow(summary))
+  for (id in clump_ids) {
+    idx <- which(summary$clump_id == id)
+    lev <- summary$profile_level[idx]
+    nlev <- max(lev, na.rm = TRUE)
+    ramp <- grDevices::colorRampPalette(c("#F4F2EF", base_cols[[as.character(id)]]))(max(2L, nlev))
+    cols[idx] <- ramp[pmax(1L, pmin(nlev, lev))]
+  }
+  names(cols) <- as.character(summary$profile_region)
+  cols
+}
+
+.clump_plot_profile_labels <- function(labels, summary) {
+  ids <- sort(unique(labels[is.finite(labels) & labels > 0]))
+  cols <- .clump_profile_region_colors(summary)
+  missing <- setdiff(as.character(ids), names(cols))
+  if (length(missing)) {
+    fallback <- grDevices::colorRampPalette(c("#213E60", "#E68C3A", "#66A7B0"))(length(missing))
+    names(fallback) <- missing
+    cols <- c(cols, fallback)
+  }
+  df <- .clump_melt(labels, "region")
+  df$region <- factor(df$region, levels = ids)
+  ggplot2::ggplot(df, ggplot2::aes(Row, Col, fill = region)) +
+    ggplot2::geom_tile(width = 1, height = 1) +
+    ggplot2::coord_fixed(expand = FALSE) +
+    ggplot2::scale_fill_manual(values = cols, na.value = "white", guide = "none", drop = FALSE) +
+    ggplot2::theme_void() +
+    ggplot2::theme(
+      plot.background = ggplot2::element_rect(fill = "white", colour = NA),
+      panel.background = ggplot2::element_rect(fill = "white", colour = NA)
+    )
+}
+
+.clump_plot_overlay <- function(scalar, labels, summary = NULL, alpha = 0.72) {
   bg_norm <- .clump_normalize01(scalar)
   bg_idx <- matrix(
     as.integer(cut(bg_norm, breaks = seq(0, 1, length.out = 257), include.lowest = TRUE)),
@@ -690,8 +910,13 @@ plot_clump_diagnostics <- function(x,
   bg <- .clump_melt(bg_col, "fill_col")
   lab <- .clump_melt(labels, "region")
   ids <- sort(unique(labels[is.finite(labels) & labels > 0]))
-  cols <- grDevices::colorRampPalette(c("#213E60", "#E68C3A", "#66A7B0", "#D65F59", "#E7C55D", "#315C91"))(max(2L, length(ids)))
-  names(cols) <- as.character(ids)
+  cols <- .clump_profile_region_colors(summary)
+  missing <- setdiff(as.character(ids), names(cols))
+  if (length(missing)) {
+    fallback <- grDevices::colorRampPalette(c("#213E60", "#E68C3A", "#66A7B0", "#D65F59", "#E7C55D", "#315C91"))(length(missing))
+    names(fallback) <- missing
+    cols <- c(cols, fallback)
+  }
   lab$fill_col <- cols[as.character(lab$region)]
   lab <- lab[is.finite(lab$region) & lab$region > 0, , drop = FALSE]
 

@@ -25,6 +25,16 @@ segment_clumps(
   sed_weight = 0.5,
   small_sigma = 0.7,
   large_sigma = 4,
+  apply_quality_filter = FALSE,
+  min_peak_score = 0.35,
+  min_median_score = NULL,
+  min_peak_contrast = 0.15,
+  min_peak_sed_anomaly = 0.15,
+  high_score_threshold = 0.35,
+  min_high_score_pixels = 3L,
+  probable_peak_score = 0.15,
+  probable_peak_contrast = 0.15,
+  probable_peak_sed_anomaly = 0.1,
   body_segment = TRUE,
   knn_k = 40,
   auto_k = FALSE,
@@ -79,6 +89,16 @@ If \code{NULL}, seeds are detected automatically.}
 \item{small_sigma}{Compact smoothing scale for the clump score.}
 
 \item{large_sigma}{Background smoothing scale for the clump score.}
+
+\item{apply_quality_filter}{Logical; if \code{TRUE}, discard candidate clumps that
+fail the evidence cuts before profile splitting.}
+
+\item{min_peak_score, min_median_score, min_peak_contrast, min_peak_sed_anomaly}{Evidence cuts passed to \code{\link[=clump_evidence_table]{clump_evidence_table()}}.}
+
+\item{high_score_threshold, min_high_score_pixels}{High-score-pixel criterion
+passed to \code{\link[=clump_evidence_table]{clump_evidence_table()}}.}
+
+\item{probable_peak_score, probable_peak_contrast, probable_peak_sed_anomaly}{Looser evidence thresholds used for \code{"probable"} clumps.}
 
 \item{body_segment}{Logical; segment the remaining diffuse body.}
 
