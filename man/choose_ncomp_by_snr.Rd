@@ -47,9 +47,8 @@ for the S/N calculation.}
 \item{band_values}{Optional band labels or wavelengths passed to
 \code{\link[=extract_region_sed]{extract_region_sed()}}.}
 
-\item{backend}{Clustering backend: \code{"exact"} calls
-\code{\link[=segment_regions]{segment_regions()}} and \code{"sparse"} calls
-\code{\link[=segment_regions_large]{segment_regions_large()}}.}
+\item{backend}{Clustering backend: \code{"exact"} calls \code{\link[=segment_regions]{segment_regions()}} and
+\code{"sparse"} calls \code{\link[=segment_regions_large]{segment_regions_large()}}.}
 
 \item{snr_stat}{Either integrated S/N across the selected wavelengths or the
 median per-wavelength S/N.}
@@ -60,24 +59,24 @@ median per-wavelength S/N.}
 \item{variance_inflation}{Multiplicative factor applied to propagated
 variances.}
 
-\item{error_fallback}{Fallback error model used by
-\code{\link[=extract_region_sed]{extract_region_sed()}} when no \code{var_cube} is provided.}
+\item{error_fallback}{Fallback error model used by \code{\link[=extract_region_sed]{extract_region_sed()}}
+when no \code{var_cube} is provided.}
 
 \item{verbose}{Logical; print progress messages.}
 
-\item{...}{Additional arguments passed to \code{\link[=segment_regions]{segment_regions()}}
-or \code{\link[=segment_regions_large]{segment_regions_large()}}.}
+\item{...}{Additional arguments passed to \code{\link[=segment_regions]{segment_regions()}} or
+\code{\link[=segment_regions_large]{segment_regions_large()}}.}
 }
 \value{
-A SAGUI segmentation result for the selected number of regions. The result also
-contains \code{region_snr}, \code{snr_grid}, \code{snr_target}, and \code{snr_selection}
-entries.
+A SAGUI segmentation result for the selected number of regions. The
+result also contains \code{region_snr}, \code{snr_grid}, \code{snr_target}, and
+\code{snr_selection} entries.
 }
 \description{
 This helper runs SAGUI over a grid of candidate region counts and keeps the
 finest segmentation satisfying a regional S/N cut. Use \code{min_snr} for the
 common case where every region must exceed a minimum S/N. Unlike the quick
-\code{cluster_snr} diagnostic returned by \code{\link[=segment_regions]{segment_regions()}},
-this function can evaluate the S/N from the flux-conserving regional SED table
-produced by \code{\link[=extract_region_sed]{extract_region_sed()}}.
+\code{cluster_snr} diagnostic returned by \code{\link[=segment_regions]{segment_regions()}}, this function can
+evaluate the S/N from the flux-conserving regional SED table produced by
+\code{\link[=extract_region_sed]{extract_region_sed()}}.
 }

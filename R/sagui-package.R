@@ -9,6 +9,7 @@
 "_PACKAGE"
 
 utils::globalVariables(c(
-  "band", "Cluster", "Col", "flux", "flux_err", "geometry", "n_eff",
-  "n_pix", "ok", "region", "Row", "Value"
+  "band", "Cluster", "Col", "fill_col", "flux", "flux_err", "geometry",
+  "n_eff", "n_pix", "ok", "profile_region", "region", "Row", "value",
+  "Value"
 ))

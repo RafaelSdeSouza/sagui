@@ -17,8 +17,8 @@ reject_background_regions(
 )
 }
 \arguments{
-\item{segmentation}{A result returned by \code{\link[=segment_regions]{segment_regions()}}
-or \code{\link[=segment_regions_large]{segment_regions_large()}}.}
+\item{segmentation}{A result returned by \code{\link[=segment_regions]{segment_regions()}} or
+\code{\link[=segment_regions_large]{segment_regions_large()}}.}
 
 \item{evidence}{Optional 2-D evidence map. If \code{NULL}, the function tries to
 use \code{segmentation$support$details$evidence}.}
@@ -32,14 +32,14 @@ function tries to use \code{segmentation$support$details$evidence_count}.}
 \item{min_median_persistence}{Minimum median band-persistence count required
 for a region.}
 
-\item{low_evidence_quantile}{Quantile used to define low-evidence regions when
-\code{min_median_evidence = NULL}.}
+\item{low_evidence_quantile}{Quantile used to define low-evidence regions
+when \code{min_median_evidence = NULL}.}
 
-\item{reject_edge_low_evidence}{Logical; reject edge-connected regions with low
+\item{reject_edge_low_evidence}{Logical; reject edge-connected regions with
+low median evidence.}
+
+\item{reject_large_low_evidence}{Logical; reject large regions with low
 median evidence.}
-
-\item{reject_large_low_evidence}{Logical; reject large regions with low median
-evidence.}
 
 \item{large_area_quantile}{Quantile of region areas used to identify large
 regions when \code{reject_large_low_evidence = TRUE}.}
@@ -50,7 +50,7 @@ The input segmentation with \code{cluster_map} updated and with
 }
 \description{
 Applies a simple, explicit region-level background classifier to a SAGUI
-segmentation. This is designed to be used after an intentionally loose support
-and optional oversegmentation: let the clustering isolate candidate structures,
-then remove regions with weak multi-band support.
+segmentation. This is designed to be used after an intentionally loose
+support and optional oversegmentation: let the clustering isolate candidate
+structures, then remove regions with weak multi-band support.
 }

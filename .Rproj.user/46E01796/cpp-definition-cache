@@ -1,1 +1,69 @@
-[]
+[
+    {
+        "file": "/Users/rd23aag/Documents/GitHub/sagui/src/sparse_ward_cut.cpp",
+        "file_last_write": 1778029893.0,
+        "definitions": [
+            {
+                "usr": "c:@S@SparseWardEdge",
+                "kind": 3,
+                "parent_name": "",
+                "name": "SparseWardEdge",
+                "file": "/Users/rd23aag/Documents/GitHub/sagui/src/sparse_ward_cut.cpp",
+                "line": 11,
+                "column": 8,
+                "hidden": false
+            },
+            {
+                "usr": "c:@S@SparseWardEdgeCompare",
+                "kind": 3,
+                "parent_name": "",
+                "name": "SparseWardEdgeCompare",
+                "file": "/Users/rd23aag/Documents/GitHub/sagui/src/sparse_ward_cut.cpp",
+                "line": 17,
+                "column": 8,
+                "hidden": false
+            },
+            {
+                "usr": "c:@S@SparseWardEdgeCompare@F@operator()#&1$@S@SparseWardEdge#S0_#1",
+                "kind": 7,
+                "parent_name": "SparseWardEdgeCompare",
+                "name": "operator(const SparseWardEdge &, const SparseWardEdge &)",
+                "file": "/Users/rd23aag/Documents/GitHub/sagui/src/sparse_ward_cut.cpp",
+                "line": 18,
+                "column": 8,
+                "hidden": false
+            },
+            {
+                "usr": "c:@F@sparse_ward_find_root#&$@N@std@N@__1@S@vector>#I#$@N@std@N@__1@S@allocator>#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "sparse_ward_find_root(std::vector<int> &, int)",
+                "file": "/Users/rd23aag/Documents/GitHub/sagui/src/sparse_ward_cut.cpp",
+                "line": 23,
+                "column": 5,
+                "hidden": false
+            },
+            {
+                "usr": "c:@F@sparse_ward_score#&1$@N@Rcpp@S@Matrix>#VI14#@N@Rcpp@ST>1#T@PreserveStorage#&1$@N@std@N@__1@S@vector>#d#$@N@std@N@__1@S@allocator>#d#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "sparse_ward_score(const NumericMatrix &, const std::vector<double> &, int, int)",
+                "file": "/Users/rd23aag/Documents/GitHub/sagui/src/sparse_ward_cut.cpp",
+                "line": 36,
+                "column": 8,
+                "hidden": false
+            },
+            {
+                "usr": "c:@F@sagui_sparse_ward_cut_cpp#$@N@Rcpp@S@Matrix>#VI14#@N@Rcpp@ST>1#T@PreserveStorage#$@N@Rcpp@S@Matrix>#VI13#@N@Rcpp@ST>1#T@PreserveStorage#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "sagui_sparse_ward_cut_cpp(NumericMatrix, IntegerMatrix, int)",
+                "file": "/Users/rd23aag/Documents/GitHub/sagui/src/sparse_ward_cut.cpp",
+                "line": 52,
+                "column": 15,
+                "hidden": false
+            }
+        ],
+        "hidden": false
+    }
+]

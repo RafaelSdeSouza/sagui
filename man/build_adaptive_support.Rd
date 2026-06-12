@@ -21,9 +21,9 @@ build_adaptive_support(
 \arguments{
 \item{input}{3-D array or FITS-like list with \code{imDat}.}
 
-\item{bands}{Bands used to build the support. May be \code{NULL} for all bands,
-a numeric vector of band indices, or a character vector matching cube dimnames
-along the third dimension.}
+\item{bands}{Bands used to build the support. May be \code{NULL} for all bands, a
+numeric vector of band indices, or a character vector matching cube
+dimnames along the third dimension.}
 
 \item{pretransform}{Optional cube pretransform applied before support
 construction. Uses \code{\link[=pretransform_cube]{pretransform_cube()}}.}
@@ -40,28 +40,28 @@ uses image borders; \code{"all"} uses all finite pixels.}
 
 \item{z_threshold}{Band-wise detection threshold in robust sigma units.}
 
-\item{min_band_persistence}{Minimum number of bands above \code{z_threshold}. If
-\code{NULL}, defaults to two bands when possible.}
+\item{min_band_persistence}{Minimum number of bands above \code{z_threshold}.
+If \code{NULL}, defaults to two bands when possible.}
 
-\item{single_band_z}{Optional single-band rescue threshold. Pixels above this
-robust significance in any selected band are kept even if they fail
+\item{single_band_z}{Optional single-band rescue threshold. Pixels above
+this robust significance in any selected band are kept even if they fail
 \code{min_band_persistence}. Use \code{Inf} to disable.}
 
-\item{smooth_sigma}{Optional Gaussian smoothing applied to each significance map
-before thresholding. Requires \code{EBImage} or \code{imager}.}
+\item{smooth_sigma}{Optional Gaussian smoothing applied to each significance
+map before thresholding. Requires \code{EBImage} or \code{imager}.}
 }
 \value{
 A list with \code{collapsed}, \code{reconstruction}, \code{mask}, \code{evidence},
 \code{evidence_count}, \code{z_maps}, \code{band_stats}, and metadata.
 }
 \description{
-Builds a foreground support from band-wise detection evidence rather than from
-a single collapsed white image. Each selected band is optionally transformed,
-converted to a robust sky-normalized significance map, and then thresholded.
-The final support keeps pixels detected in at least \code{min_band_persistence}
-bands, with an optional high-significance single-band rescue channel.
-}
-\details{
+Builds a foreground support from band-wise detection evidence rather than
+from a single collapsed white image. Each selected band is optionally
+transformed, converted to a robust sky-normalized significance map, and then
+thresholded. The final support keeps pixels detected in at least
+\code{min_band_persistence} bands, with an optional high-significance single-band
+rescue channel.
+
 This is intended for difficult broadband/medium-band cubes where a single
 white-light starlet mask can either cut diffuse emission or keep too much
 structured background.
