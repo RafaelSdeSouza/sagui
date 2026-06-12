@@ -440,6 +440,18 @@ clump_evidence_table <- function(clump_labels,
 #'   [build_adaptive_support()]. If `NULL`, adaptive support is built.
 #' @param support_args Named list passed to [build_adaptive_support()] when
 #'   `support_info = NULL` and `support = NULL`.
+#' @param clump_search_mask Optional logical mask with the same spatial
+#'   dimensions as the cube. When supplied, automatic clump seeds are searched
+#'   only inside this mask, while the diffuse body can still be segmented over
+#'   the full foreground support. Use this to target context-specific compact
+#'   structures, e.g. off-disc jellyfish knots, in-disc HII regions, or halo
+#'   compact-source candidates.
+#' @param clump_reject_mask Optional logical mask with the same spatial
+#'   dimensions as the cube. Candidate clump footprints whose overlap with this
+#'   mask exceeds `clump_reject_fraction` are removed before profile splitting.
+#'   This is a generic context filter, not a science label.
+#' @param clump_reject_fraction Maximum allowed footprint overlap with
+#'   `clump_reject_mask`.
 #' @param clump_seeds Optional data frame with `clump_id`, `row`, and `col`.
 #'   If `NULL`, seeds are detected automatically.
 #' @param n_clumps Optional exact number of automatic clump seeds.
@@ -489,6 +501,9 @@ segment_clumps <- function(input,
                            support = NULL,
                            support_info = NULL,
                            support_args = list(),
+                           clump_search_mask = NULL,
+                           clump_reject_mask = NULL,
+                           clump_reject_fraction = 0.5,
                            clump_seeds = NULL,
                            n_clumps = NULL,
                            max_clumps = 50L,
@@ -552,6 +567,23 @@ segment_clumps <- function(input,
     support <- support_info$mask
   }
   support <- is.finite(support) & support
+  clump_search_mask <- .clump_optional_mask(
+    clump_search_mask,
+    dims = dim(support),
+    name = "clump_search_mask"
+  )
+  clump_reject_mask <- .clump_optional_mask(
+    clump_reject_mask,
+    dims = dim(support),
+    name = "clump_reject_mask"
+  )
+  clump_reject_fraction <- as.numeric(clump_reject_fraction)
+  if (!is.finite(clump_reject_fraction)) clump_reject_fraction <- 0.5
+  clump_reject_fraction <- pmin(1, pmax(0, clump_reject_fraction))
+  clump_seed_support <- support
+  if (!is.null(clump_search_mask)) {
+    clump_seed_support <- clump_seed_support & clump_search_mask
+  }
 
   if (verbose) {
     message("Computing clump score...")
@@ -570,7 +602,7 @@ segment_clumps <- function(input,
     if (verbose) message("Detecting SED-clump seeds...")
     clump_seeds <- detect_sed_clumps(
       score = score_info$score,
-      support = support,
+      support = clump_seed_support,
       n_clumps = n_clumps,
       max_clumps = max_clumps,
       score_quantile = score_quantile,
@@ -578,6 +610,10 @@ segment_clumps <- function(input,
     )
   } else {
     clump_seeds <- .clump_normalize_seed_table(clump_seeds, dim(support))
+    if (!is.null(clump_search_mask) && nrow(clump_seeds)) {
+      in_search <- clump_search_mask[cbind(clump_seeds$row, clump_seeds$col)]
+      clump_seeds <- clump_seeds[in_search %in% TRUE, , drop = FALSE]
+    }
   }
   n_seed_groups <- length(unique(clump_seeds$clump_id))
 
@@ -623,6 +659,41 @@ segment_clumps <- function(input,
       all.x = TRUE,
       sort = FALSE
     )
+  }
+  clump_context <- .clump_context_overlap(
+    clump_labels = footprints$clump_labels,
+    reject_mask = clump_reject_mask
+  )
+  if (nrow(clump_context)) {
+    footprints$footprint_summary <- merge(
+      footprints$footprint_summary,
+      clump_context,
+      by = "clump_id",
+      all.x = TRUE,
+      sort = FALSE
+    )
+  }
+  if (!is.null(clump_reject_mask) && nrow(clump_context)) {
+    keep_ids <- clump_context$clump_id[
+      is.na(clump_context$reject_fraction) |
+        clump_context$reject_fraction <= clump_reject_fraction
+    ]
+    if (verbose) {
+      message(
+        "Keeping ", length(keep_ids), " clump candidate(s) after context-mask filtering."
+      )
+    }
+    drop <- is.finite(footprints$clump_labels) &
+      footprints$clump_labels > 0 &
+      !footprints$clump_labels %in% keep_ids
+    footprints$clump_labels[drop] <- NA_integer_
+    footprints$footprint_summary <- footprints$footprint_summary[
+      footprints$footprint_summary$clump_id %in% keep_ids,
+      ,
+      drop = FALSE
+    ]
+    clump_quality <- clump_quality[clump_quality$clump_id %in% keep_ids, , drop = FALSE]
+    clump_context <- clump_context[clump_context$clump_id %in% keep_ids, , drop = FALSE]
   }
   if (isTRUE(apply_quality_filter) && nrow(clump_quality)) {
     keep_ids <- clump_quality$clump_id[
@@ -683,6 +754,7 @@ segment_clumps <- function(input,
     mask = support,
     collapsed = score_info$collapsed,
     support = list(method = "clump", details = support_info),
+    clump_context = clump_context,
     clump_score = score_info,
     clump_seeds = clump_seeds,
     clump_quality = clump_quality,
@@ -701,6 +773,9 @@ segment_clumps <- function(input,
       core_drop_frac = core_drop_frac,
       sigma_threshold = sigma_threshold,
       connectivity = connectivity,
+      has_clump_search_mask = !is.null(clump_search_mask),
+      has_clump_reject_mask = !is.null(clump_reject_mask),
+      clump_reject_fraction = clump_reject_fraction,
       apply_quality_filter = apply_quality_filter,
       min_peak_score = min_peak_score,
       min_median_score = min_median_score,
@@ -764,6 +839,44 @@ plot_clump_diagnostics <- function(x,
   cube <- if (is.list(input) && !is.null(input$imDat)) input$imDat else input
   stopifnot(is.array(cube), length(dim(cube)) == 3L)
   cube
+}
+
+.clump_optional_mask <- function(mask, dims, name = "mask") {
+  if (is.null(mask)) return(NULL)
+  mask <- as.matrix(mask)
+  if (!identical(dim(mask), dims)) {
+    stop("`", name, "` must have the same spatial dimensions as the cube.")
+  }
+  is.finite(mask) & mask
+}
+
+.clump_context_overlap <- function(clump_labels, reject_mask = NULL) {
+  if (is.null(reject_mask)) {
+    return(data.frame(
+      clump_id = integer(),
+      reject_n_pix = integer(),
+      reject_fraction = numeric()
+    ))
+  }
+  ids <- sort(unique(clump_labels[is.finite(clump_labels) & clump_labels > 0]))
+  if (!length(ids)) {
+    return(data.frame(
+      clump_id = integer(),
+      reject_n_pix = integer(),
+      reject_fraction = numeric()
+    ))
+  }
+  rows <- lapply(ids, function(id) {
+    idx <- which(clump_labels == id)
+    n_reject <- sum(reject_mask[idx] %in% TRUE, na.rm = TRUE)
+    data.frame(
+      clump_id = as.integer(id),
+      reject_n_pix = as.integer(n_reject),
+      reject_fraction = n_reject / length(idx),
+      stringsAsFactors = FALSE
+    )
+  })
+  do.call(rbind, rows)
 }
 
 .clump_resolve_bands <- function(cube, bands) {

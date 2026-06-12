@@ -11,6 +11,9 @@ segment_clumps(
   support = NULL,
   support_info = NULL,
   support_args = list(),
+  clump_search_mask = NULL,
+  clump_reject_mask = NULL,
+  clump_reject_fraction = 0.5,
   clump_seeds = NULL,
   n_clumps = NULL,
   max_clumps = 50L,
@@ -21,6 +24,10 @@ segment_clumps(
   max_radius = 7L,
   min_pixels = 9L,
   footprint_quantile = 0.1,
+  core_drop_frac = 0.2,
+  sigma_threshold = 3,
+  footprint_mode = c("connected", "radial"),
+  connectivity = 8L,
   contrast_weight = 0.5,
   sed_weight = 0.5,
   small_sigma = 0.7,
@@ -61,6 +68,21 @@ be the PSF-matched cube used for segmentation.}
 \item{support_args}{Named list passed to \code{\link[=build_adaptive_support]{build_adaptive_support()}} when
 \code{support_info = NULL} and \code{support = NULL}.}
 
+\item{clump_search_mask}{Optional logical mask with the same spatial
+dimensions as the cube. When supplied, automatic clump seeds are searched
+only inside this mask, while the diffuse body can still be segmented over
+the full foreground support. Use this to target context-specific compact
+structures, e.g. off-disc jellyfish knots, in-disc HII regions, or halo
+compact-source candidates.}
+
+\item{clump_reject_mask}{Optional logical mask with the same spatial
+dimensions as the cube. Candidate clump footprints whose overlap with this
+mask exceeds \code{clump_reject_fraction} are removed before profile splitting.
+This is a generic context filter, not a science label.}
+
+\item{clump_reject_fraction}{Maximum allowed footprint overlap with
+\code{clump_reject_mask}.}
+
 \item{clump_seeds}{Optional data frame with \code{clump_id}, \code{row}, and \code{col}.
 If \code{NULL}, seeds are detected automatically.}
 
@@ -81,6 +103,20 @@ If \code{NULL}, seeds are detected automatically.}
 \item{min_pixels}{Minimum pixels per grown clump footprint.}
 
 \item{footprint_quantile}{Local score quantile used to trim grown footprints.}
+
+\item{core_drop_frac}{For connected footprints, keep connected pixels above
+this fraction of the seed-core brightness contrast relative to the local
+background.}
+
+\item{sigma_threshold}{For connected footprints, keep connected pixels above
+this robust local-background significance threshold. Use \code{NULL} to disable.}
+
+\item{footprint_mode}{Footprint-growth mode. \code{"connected"} uses the seed only
+as an anchor and returns the connected high-score component, allowing
+elongated or irregular clump shapes. \code{"radial"} keeps the older compact
+radius-based growth.}
+
+\item{connectivity}{Pixel connectivity used by \code{footprint_mode = "connected"}.}
 
 \item{contrast_weight}{Weight of compact local contrast in the clump score.}
 
