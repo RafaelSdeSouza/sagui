@@ -41,7 +41,9 @@ segment_clumps(
   min_high_score_pixels = 3L,
   probable_peak_score = 0.15,
   probable_peak_contrast = 0.15,
+  probable_median_contrast = 0.02,
   probable_peak_sed_anomaly = 0.1,
+  clump_relax = 0.5,
   body_segment = TRUE,
   knn_k = 40,
   auto_k = FALSE,
@@ -134,7 +136,12 @@ fail the evidence cuts before profile splitting.}
 \item{high_score_threshold, min_high_score_pixels}{High-score-pixel criterion
 passed to \code{\link[=clump_evidence_table]{clump_evidence_table()}}.}
 
-\item{probable_peak_score, probable_peak_contrast, probable_peak_sed_anomaly}{Looser evidence thresholds used for \code{"probable"} clumps.}
+\item{probable_peak_score, probable_peak_contrast, probable_median_contrast, probable_peak_sed_anomaly}{Looser evidence thresholds used for \code{"probable"} clumps.}
+
+\item{clump_relax}{Single global permissiveness factor for the clump evidence
+cuts, bounded to \verb{[0, 1]}. \code{0} is conservative, \code{0.5} keeps the nominal
+thresholds, and \code{1} accepts fainter/weaker compact candidates. This does
+not use SED-fitting results.}
 
 \item{body_segment}{Logical; segment the remaining diffuse body.}
 

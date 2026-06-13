@@ -335,8 +335,11 @@ segment_clump_profiles <- function(clump_labels,
 #' @param min_peak_sed_anomaly Minimum peak local SED-anomaly score. Use `NULL` to skip.
 #' @param high_score_threshold Threshold used to count high-score pixels.
 #' @param min_high_score_pixels Minimum number of pixels above `high_score_threshold`.
-#' @param probable_peak_score,probable_peak_contrast,probable_peak_sed_anomaly
+#' @param probable_peak_score,probable_peak_contrast,probable_median_contrast,probable_peak_sed_anomaly
 #'   Looser thresholds used to mark candidates as `"probable"` clumps.
+#'   `probable_median_contrast` is a compactness/coherence floor that helps
+#'   reject broad galaxy-profile pieces with coherent SEDs but little local
+#'   brightness contrast.
 #' @param clump_relax Single global permissiveness factor for the evidence
 #'   cuts, bounded to `[0, 1]`. `0` is conservative, `0.5` keeps the supplied
 #'   thresholds close to their nominal values, and `1` is permissive. Internally
@@ -355,6 +358,7 @@ clump_evidence_table <- function(clump_labels,
                                  min_high_score_pixels = 3L,
                                  probable_peak_score = 0.15,
                                  probable_peak_contrast = 0.15,
+                                 probable_median_contrast = 0.02,
                                  probable_peak_sed_anomaly = 0.10,
                                  clump_relax = 0.5) {
   if (!is.matrix(clump_labels)) stop("`clump_labels` must be a matrix.")
@@ -386,6 +390,7 @@ clump_evidence_table <- function(clump_labels,
   high_score_threshold_eff <- scale_threshold(high_score_threshold)
   probable_peak_score_eff <- scale_threshold(probable_peak_score)
   probable_peak_contrast_eff <- scale_threshold(probable_peak_contrast)
+  probable_median_contrast_eff <- scale_threshold(probable_median_contrast)
   probable_peak_sed_anomaly_eff <- scale_threshold(probable_peak_sed_anomaly)
 
   rows <- lapply(ids, function(id) {
@@ -431,6 +436,7 @@ clump_evidence_table <- function(clump_labels,
 
   probable <- out$n_pix >= max(1L, as.integer(min_pixels)) &
     out$peak_score >= probable_peak_score_eff &
+    out$median_contrast >= probable_median_contrast_eff &
     (
       out$peak_contrast >= probable_peak_contrast_eff |
         out$peak_sed_anomaly >= probable_peak_sed_anomaly_eff
@@ -445,20 +451,27 @@ clump_evidence_table <- function(clump_labels,
   out$threshold_scale <- threshold_scale
   out$probable_peak_score_eff <- probable_peak_score_eff
   out$probable_peak_contrast_eff <- probable_peak_contrast_eff
+  out$probable_median_contrast_eff <- probable_median_contrast_eff
   out$probable_peak_sed_anomaly_eff <- probable_peak_sed_anomaly_eff
   out
 }
 
 .clump_relax_value <- function(clump_relax) {
   value <- suppressWarnings(as.numeric(clump_relax))
-  if (!length(value) || !is.finite(value[[1]])) return(0)
-  value[[1]]
+  if (!length(value) || !is.finite(value[[1]])) return(0.5)
+  pmin(1, pmax(0, value[[1]]))
 }
 
 .clump_threshold_scale <- function(clump_relax) {
   clump_relax <- .clump_relax_value(clump_relax)
-  if (!is.finite(clump_relax)) clump_relax <- 0
-  pmin(5, pmax(0.2, exp(-clump_relax)))
+  # 0.5 is the nominal setting. Lower values are stricter, higher values
+  # are more permissive, while avoiding extreme threshold jumps.
+  stats::approx(
+    x = c(0, 0.5, 1),
+    y = c(1.5, 1.0, 0.33),
+    xout = clump_relax,
+    rule = 2
+  )$y
 }
 
 #' Segment compact SED clumps and the diffuse galaxy body
@@ -523,7 +536,7 @@ clump_evidence_table <- function(clump_labels,
 #'   Evidence cuts passed to [clump_evidence_table()].
 #' @param high_score_threshold,min_high_score_pixels High-score-pixel criterion
 #'   passed to [clump_evidence_table()].
-#' @param probable_peak_score,probable_peak_contrast,probable_peak_sed_anomaly
+#' @param probable_peak_score,probable_peak_contrast,probable_median_contrast,probable_peak_sed_anomaly
 #'   Looser evidence thresholds used for `"probable"` clumps.
 #' @param clump_relax Single global permissiveness factor for the clump evidence
 #'   cuts, bounded to `[0, 1]`. `0` is conservative, `0.5` keeps the nominal
@@ -575,6 +588,7 @@ segment_clumps <- function(input,
                            min_high_score_pixels = 3L,
                            probable_peak_score = 0.15,
                            probable_peak_contrast = 0.15,
+                           probable_median_contrast = 0.02,
                            probable_peak_sed_anomaly = 0.10,
                            clump_relax = 0.5,
                            body_segment = TRUE,
@@ -694,6 +708,7 @@ segment_clumps <- function(input,
     min_high_score_pixels = min_high_score_pixels,
     probable_peak_score = probable_peak_score,
     probable_peak_contrast = probable_peak_contrast,
+    probable_median_contrast = probable_median_contrast,
     probable_peak_sed_anomaly = probable_peak_sed_anomaly,
     clump_relax = clump_relax
   )
@@ -831,6 +846,7 @@ segment_clumps <- function(input,
       min_high_score_pixels = min_high_score_pixels,
       probable_peak_score = probable_peak_score,
       probable_peak_contrast = probable_peak_contrast,
+      probable_median_contrast = probable_median_contrast,
       probable_peak_sed_anomaly = probable_peak_sed_anomaly,
       clump_relax = clump_relax,
       clump_threshold_scale = .clump_threshold_scale(clump_relax),

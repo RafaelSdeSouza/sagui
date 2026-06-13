@@ -16,7 +16,9 @@ clump_evidence_table(
   min_high_score_pixels = 3L,
   probable_peak_score = 0.15,
   probable_peak_contrast = 0.15,
-  probable_peak_sed_anomaly = 0.1
+  probable_median_contrast = 0.02,
+  probable_peak_sed_anomaly = 0.1,
+  clump_relax = 0.5
 )
 }
 \arguments{
@@ -38,7 +40,15 @@ clump_evidence_table(
 
 \item{min_high_score_pixels}{Minimum number of pixels above \code{high_score_threshold}.}
 
-\item{probable_peak_score, probable_peak_contrast, probable_peak_sed_anomaly}{Looser thresholds used to mark candidates as \code{"probable"} clumps.}
+\item{probable_peak_score, probable_peak_contrast, probable_median_contrast, probable_peak_sed_anomaly}{Looser thresholds used to mark candidates as \code{"probable"} clumps.
+\code{probable_median_contrast} is a compactness/coherence floor that helps
+reject broad galaxy-profile pieces with coherent SEDs but little local
+brightness contrast.}
+
+\item{clump_relax}{Single global permissiveness factor for the evidence
+cuts, bounded to \verb{[0, 1]}. \code{0} is conservative, \code{0.5} keeps the supplied
+thresholds close to their nominal values, and \code{1} is permissive. Internally
+the score/contrast thresholds are rescaled smoothly around \code{0.5}.}
 }
 \value{
 A data frame with clump evidence metrics, \code{quality}, and \code{accepted}.
