@@ -337,6 +337,11 @@ segment_clump_profiles <- function(clump_labels,
 #' @param min_high_score_pixels Minimum number of pixels above `high_score_threshold`.
 #' @param probable_peak_score,probable_peak_contrast,probable_peak_sed_anomaly
 #'   Looser thresholds used to mark candidates as `"probable"` clumps.
+#' @param clump_relax Single global relaxation factor for the evidence cuts.
+#'   `0` keeps the supplied thresholds unchanged, positive values make the
+#'   clump gate more permissive, and negative values make it more conservative.
+#'   Internally the score/contrast thresholds are multiplied by
+#'   `exp(-clump_relax)`, clipped to a safe range.
 #'
 #' @return A data frame with clump evidence metrics, `quality`, and `accepted`.
 #' @export
@@ -351,7 +356,8 @@ clump_evidence_table <- function(clump_labels,
                                  min_high_score_pixels = 3L,
                                  probable_peak_score = 0.15,
                                  probable_peak_contrast = 0.15,
-                                 probable_peak_sed_anomaly = 0.10) {
+                                 probable_peak_sed_anomaly = 0.10,
+                                 clump_relax = 0) {
   if (!is.matrix(clump_labels)) stop("`clump_labels` must be a matrix.")
   required <- c("score", "contrast", "sed_anomaly")
   if (!all(required %in% names(score_info))) {
@@ -389,28 +395,42 @@ clump_evidence_table <- function(clump_labels,
   })
   out <- do.call(rbind, rows)
 
+  threshold_scale <- .clump_threshold_scale(clump_relax)
+  scale_threshold <- function(x) {
+    if (is.null(x)) return(NULL)
+    as.numeric(x) * threshold_scale
+  }
+  min_peak_score_eff <- scale_threshold(min_peak_score)
+  min_median_score_eff <- scale_threshold(min_median_score)
+  min_peak_contrast_eff <- scale_threshold(min_peak_contrast)
+  min_peak_sed_anomaly_eff <- scale_threshold(min_peak_sed_anomaly)
+  high_score_threshold_eff <- scale_threshold(high_score_threshold)
+  probable_peak_score_eff <- scale_threshold(probable_peak_score)
+  probable_peak_contrast_eff <- scale_threshold(probable_peak_contrast)
+  probable_peak_sed_anomaly_eff <- scale_threshold(probable_peak_sed_anomaly)
+
   strong <- out$n_pix >= max(1L, as.integer(min_pixels))
-  if (!is.null(min_peak_score)) {
-    strong <- strong & out$peak_score >= as.numeric(min_peak_score)
+  if (!is.null(min_peak_score_eff)) {
+    strong <- strong & out$peak_score >= min_peak_score_eff
   }
-  if (!is.null(min_median_score)) {
-    strong <- strong & out$median_score >= as.numeric(min_median_score)
+  if (!is.null(min_median_score_eff)) {
+    strong <- strong & out$median_score >= min_median_score_eff
   }
-  if (!is.null(min_peak_contrast)) {
-    strong <- strong & out$peak_contrast >= as.numeric(min_peak_contrast)
+  if (!is.null(min_peak_contrast_eff)) {
+    strong <- strong & out$peak_contrast >= min_peak_contrast_eff
   }
-  if (!is.null(min_peak_sed_anomaly)) {
-    strong <- strong & out$peak_sed_anomaly >= as.numeric(min_peak_sed_anomaly)
+  if (!is.null(min_peak_sed_anomaly_eff)) {
+    strong <- strong & out$peak_sed_anomaly >= min_peak_sed_anomaly_eff
   }
   if (!is.null(min_high_score_pixels)) {
     strong <- strong & out$n_high_score >= max(1L, as.integer(min_high_score_pixels))
   }
 
   probable <- out$n_pix >= max(1L, as.integer(min_pixels)) &
-    out$peak_score >= as.numeric(probable_peak_score) &
+    out$peak_score >= probable_peak_score_eff &
     (
-      out$peak_contrast >= as.numeric(probable_peak_contrast) |
-        out$peak_sed_anomaly >= as.numeric(probable_peak_sed_anomaly)
+      out$peak_contrast >= probable_peak_contrast_eff |
+        out$peak_sed_anomaly >= probable_peak_sed_anomaly_eff
     )
 
   out$quality <- "weak"
@@ -418,7 +438,18 @@ clump_evidence_table <- function(clump_labels,
   out$quality[strong & !is.na(strong)] <- "strong"
   out$quality <- factor(out$quality, levels = c("strong", "probable", "weak"))
   out$accepted <- out$quality %in% c("strong", "probable")
+  out$clump_relax <- as.numeric(clump_relax)[[1]]
+  out$threshold_scale <- threshold_scale
+  out$probable_peak_score_eff <- probable_peak_score_eff
+  out$probable_peak_contrast_eff <- probable_peak_contrast_eff
+  out$probable_peak_sed_anomaly_eff <- probable_peak_sed_anomaly_eff
   out
+}
+
+.clump_threshold_scale <- function(clump_relax) {
+  clump_relax <- suppressWarnings(as.numeric(clump_relax)[[1]])
+  if (!is.finite(clump_relax)) clump_relax <- 0
+  pmin(5, pmax(0.2, exp(-clump_relax)))
 }
 
 #' Segment compact SED clumps and the diffuse galaxy body
@@ -485,6 +516,10 @@ clump_evidence_table <- function(clump_labels,
 #'   passed to [clump_evidence_table()].
 #' @param probable_peak_score,probable_peak_contrast,probable_peak_sed_anomaly
 #'   Looser evidence thresholds used for `"probable"` clumps.
+#' @param clump_relax Single global relaxation factor for the clump evidence
+#'   cuts. `0` keeps the supplied thresholds unchanged; positive values accept
+#'   fainter/weaker compact candidates; negative values require cleaner
+#'   candidates. This does not use SED-fitting results.
 #' @param body_segment Logical; segment the remaining diffuse body.
 #' @param knn_k,auto_k,max_k,feature_scale,spatial_weight Sparse-Ward arguments
 #'   passed to [segment_regions_large()] for the diffuse body.
@@ -532,6 +567,7 @@ segment_clumps <- function(input,
                            probable_peak_score = 0.15,
                            probable_peak_contrast = 0.15,
                            probable_peak_sed_anomaly = 0.10,
+                           clump_relax = 0,
                            body_segment = TRUE,
                            knn_k = 40,
                            auto_k = FALSE,
@@ -649,7 +685,8 @@ segment_clumps <- function(input,
     min_high_score_pixels = min_high_score_pixels,
     probable_peak_score = probable_peak_score,
     probable_peak_contrast = probable_peak_contrast,
-    probable_peak_sed_anomaly = probable_peak_sed_anomaly
+    probable_peak_sed_anomaly = probable_peak_sed_anomaly,
+    clump_relax = clump_relax
   )
   if (nrow(clump_quality)) {
     footprints$footprint_summary <- merge(
@@ -786,6 +823,8 @@ segment_clumps <- function(input,
       probable_peak_score = probable_peak_score,
       probable_peak_contrast = probable_peak_contrast,
       probable_peak_sed_anomaly = probable_peak_sed_anomaly,
+      clump_relax = clump_relax,
+      clump_threshold_scale = .clump_threshold_scale(clump_relax),
       bands = bands,
       feature_scale = feature_scale,
       spatial_weight = spatial_weight,
