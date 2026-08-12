@@ -90,7 +90,12 @@ knitr::kable(head(regional$flux_long), digits = 4)
 ```
 
 ```{r first-run-figure, echo=FALSE, out.width="100%", fig.cap="Six categorical regions and their fixed-seed nine-band regional SEDs. Curves are normalised at 2 µm only for shape comparison."}
-figure_path <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures", "sagui-first-run-synthetic-sed.png")
+figure_path <- system.file(
+  "help",
+  "figures",
+  "sagui-first-run-synthetic-sed.png",
+  package = "sagui"
+)
 knitr::include_graphics(figure_path)
 ```
 

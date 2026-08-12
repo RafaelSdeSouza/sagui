@@ -14,7 +14,7 @@ without its original data access and calibration context.
 ## Sagui-10 {#sagui-10-main-example}
 
 ```{r sagui10, echo=FALSE, out.width="100%", fig.cap="Sagui-10 photometric SED segmentation. Colours are categorical region labels."}
-path <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures", "sagui10_n20.png")
+path <- system.file("help", "figures", "sagui10_n20.png", package = "sagui")
 knitr::include_graphics(path)
 ```
 
@@ -23,14 +23,19 @@ shown below is retained as a verified repository asset; consult the provenance
 table before treating it as reproducible from public inputs alone.
 
 ```{r sagui10-sed, echo=FALSE, out.width="100%", fig.cap="Regional SED fit retained with the Sagui-10 example."}
-path <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures", "sagui10_sedfit_region_1.png")
+path <- system.file(
+  "help",
+  "figures",
+  "sagui10_sedfit_region_1.png",
+  package = "sagui"
+)
 knitr::include_graphics(path)
 ```
 
 ## Faint bridge {#sagui-11-faint-bridge}
 
 ```{r bridge, echo=FALSE, out.width="100%", fig.cap="Sagui-11 low-surface-brightness composite and copula-pretransformed segmentation."}
-base <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures")
+base <- system.file("help", "figures", package = "sagui")
 knitr::include_graphics(c(file.path(base, "sagui11_lsb_composite.png"), file.path(base, "sagui11_lsb_copula.png")))
 ```
 
@@ -40,7 +45,12 @@ Compare it with an untransformed run before interpreting the bridge.
 ## Target S/N {#target-sn-selection}
 
 ```{r target-snr, echo=FALSE, out.width="100%", fig.cap="Sagui-10 candidate selected under a minimum regional S/N threshold of 10."}
-path <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures", "sagui10_target_snr_10.png")
+path <- system.file(
+  "help",
+  "figures",
+  "sagui10_target_snr_10.png",
+  package = "sagui"
+)
 knitr::include_graphics(path)
 ```
 
@@ -52,7 +62,12 @@ the variance model and candidate grid.
 ## Bagpipes hand-off
 
 ```{r bagpipes, echo=FALSE, out.width="100%", fig.cap="Bagpipes model photometry for Sagui-8 region 8, generated from a Sagui regional SED."}
-path <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures", "sagui8_region8_bagpipes_sedfit.png")
+path <- system.file(
+  "help",
+  "figures",
+  "sagui8_region8_bagpipes_sedfit.png",
+  package = "sagui"
+)
 knitr::include_graphics(path)
 ```
 
