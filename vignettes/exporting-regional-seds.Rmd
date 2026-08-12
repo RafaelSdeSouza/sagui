@@ -7,8 +7,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Measure regional SEDs on the flux cube intended for science, using the
-categorical label map learned from the segmentation representation.
+Measure regional SEDs from the calibrated flux cube, using the segmentation map
+to group pixels.
 
 ## Extract
 

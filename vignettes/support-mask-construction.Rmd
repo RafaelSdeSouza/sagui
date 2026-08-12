@@ -8,7 +8,7 @@ vignette: >
 ---
 
 A support mask decides which pixels are eligible for segmentation. It is not a
-region map and it does not encode physical ordering.
+segmentation map.
 
 ## Starlet support
 

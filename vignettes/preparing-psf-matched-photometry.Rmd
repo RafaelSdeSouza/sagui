@@ -32,8 +32,8 @@ stopifnot(length(unique(lapply(planes, dim))) == 1L)
 cube <- simplify2array(planes)
 ```
 
-Apply exactly the same geometric operations to the variance planes. Never use
-display-stretched pixels for flux measurement.
+Apply the same geometric operations to the variance planes. Measure fluxes
+from the calibrated images, not display stretches.
 
 ## Validate
 

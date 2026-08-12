@@ -48,7 +48,7 @@ navbar:
       text: Bagpipes
       href: articles/paper-examples-reproduction.html
     reference:
-      text: Reference
+      text: Functions
       href: reference/index.html
     paper:
       text: Paper

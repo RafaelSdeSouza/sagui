@@ -47,5 +47,5 @@ default `"none"` preserves the input representation. Alternatives such as
 `"copula_gaussian"` change the clustering geometry; compare them against
 `"none"`.
 
-Region labels are categorical. Never map their integer values to an ordered
-colour scale or interpret a larger label as a larger physical quantity.
+Region labels are categorical. Their integer values do not represent a
+physical ordering.
