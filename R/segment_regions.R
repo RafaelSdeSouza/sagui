@@ -94,8 +94,20 @@ build_starlet_mask <- function(input,
   out
 }
 
-.compute_distance_matrix <- function(x) {
-  if (requireNamespace("torch", quietly = TRUE)) {
+.torch_runtime_available <- function(
+    namespace_available = requireNamespace("torch", quietly = TRUE),
+    runtime_check = function() torch::torch_is_installed()) {
+  if (!isTRUE(namespace_available)) {
+    return(FALSE)
+  }
+
+  isTRUE(tryCatch(runtime_check(), error = function(e) FALSE))
+}
+
+.compute_distance_matrix <- function(
+    x,
+    torch_available = .torch_runtime_available()) {
+  if (isTRUE(torch_available)) {
     xt <- torch::torch_tensor(x, dtype = torch::torch_float())
     dmat <- as.matrix(torch::as_array(torch::torch_cdist(xt, xt, p = 2)$cpu()))
     return(stats::as.dist(dmat))
