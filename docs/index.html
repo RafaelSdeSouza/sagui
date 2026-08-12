@@ -45,8 +45,8 @@
     <li><a class="dropdown-item" href="articles/python-astropy-handoff.html">Python and Astropy</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="articles/paper-examples-reproduction.html">Examples</a></li>
-<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/paper-examples-reproduction.html">Bagpipes</a></li>
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Functions</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://doi.org/10.1093/mnras/stag1062">Paper</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/RafaelSdeSouza/sagui">GitHub</a></li>
       </ul>
@@ -104,7 +104,7 @@ Real manuscript examples. Region colours are categorical labels, not an ordered 
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<p>This deterministic example simulates a small resolved galaxy in nine near-infrared bands. Its pixels mix bulge, disc, and two star-forming-knot SED profiles inside an elliptical support. The simulation is illustrative; it is not an observational data product.</p>
+<p>This example simulates a small resolved galaxy in nine near-infrared bands. Its pixels mix bulge, disc, and two star-forming-knot SED profiles inside an elliptical support.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
@@ -151,7 +151,7 @@ Real manuscript examples. Region colours are categorical labels, not an ordered 
 <span><span class="op">)</span></span></code></pre></div>
 <figure><img src="reference/figures/sagui-first-run-synthetic-sed.png" alt="Synthetic Sagui example showing six categorical galaxy regions beside their normalized nine-band regional SEDs with uncertainty bars"><figcaption>
 A fixed-seed, nine-band simulation. The left panel shows categorical regions; the right panel shows flux-preserving regional SED shapes normalised at 2 micrometres for comparison.
-</figcaption></figure><p>The regional table is the hand-off product for downstream fitting:</p>
+</figcaption></figure><p>The output contains the integrated photometry for each region:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">regional</span><span class="op">$</span><span class="va">flux_long</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"region"</span>, <span class="st">"lambda"</span>, <span class="st">"flux"</span>, <span class="st">"flux_err"</span>, <span class="st">"n_pix"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -186,7 +186,6 @@ A fixed-seed, nine-band simulation. The left panel shows categorical regions; th
 </tr>
 </tbody>
 </table>
-<p>These are deterministic simulation outputs, not observational measurements.</p>
 </div>
 <div class="section level2">
 <h2 id="continue">Continue<a class="anchor" aria-label="anchor" href="#continue"></a>
@@ -195,18 +194,18 @@ A fixed-seed, nine-band simulation. The left panel shows categorical regions; th
 <li><a href="articles/preparing-psf-matched-photometry.html">Prepare PSF-matched photometry</a></li>
 <li><a href="articles/choosing-number-of-regions.html">Choose a region count</a></li>
 <li><a href="articles/exporting-regional-seds.html">Export regional SEDs</a></li>
-<li><a href="articles/paper-examples-reproduction.html">Reproduce the paper examples</a></li>
+<li><a href="articles/paper-examples-reproduction.html">Fit a regional SED with Bagpipes</a></li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="core-api">Core API<a class="anchor" aria-label="anchor" href="#core-api"></a>
 </h2>
-<p>Use <a href="reference/segment_regions.html"><code>segment_regions()</code></a> for exact Ward clustering and <a href="reference/segment_regions_large.html"><code>segment_regions_large()</code></a> when the all-pairs distance matrix is too large. Both return the categorical region map and provenance-relevant settings used by the segmentation.</p>
+<p>Use <a href="reference/segment_regions.html"><code>segment_regions()</code></a> for exact Ward clustering and <a href="reference/segment_regions_large.html"><code>segment_regions_large()</code></a> when the all-pairs distance matrix is too large. Both return the categorical region map and the parameters used for the segmentation.</p>
 </div>
 <div class="section level2">
 <h2 id="about">About<a class="anchor" aria-label="anchor" href="#about"></a>
 </h2>
-<p>Sagui is part of the <a href="https://cosmostatistics-initiative.org/" class="external-link">COIN Toolbox</a>. Please cite the software paper with <code>citation("sagui")</code>. Limitations and the status of each paper-reproduction asset are stated in the <a href="articles/paper-examples-reproduction.html">examples guide</a>.</p>
+<p>Sagui is part of the <a href="https://cosmostatistics-initiative.org/" class="external-link">COIN Toolbox</a>. Please cite the software paper with <code>citation("sagui")</code>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
