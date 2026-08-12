@@ -1,9 +1,7 @@
-# Getting Started
+# Get Started
 
-Sagui separates four operations: prepare a common multiband cube,
-construct a spatial support, assign categorical regions, and measure
-regional SEDs. Keeping those operations explicit makes the result easier
-to reproduce.
+Sagui prepares a common multiband cube, constructs a spatial support,
+assigns categorical regions, and measures their integrated SEDs.
 
 ## Install
 
@@ -15,9 +13,8 @@ library(sagui)
 
 ## Simulate a galaxy
 
-This fixed-seed example mixes bulge, disc, and two knot profiles in nine
-bands. It is an API demonstration, not an observation or a physical
-inference.
+This fixed-seed simulation mixes bulge, disc, and two knot profiles in
+nine bands.
 
 ``` r
 set.seed(42)
@@ -51,8 +48,8 @@ for (b in seq_along(bands)) cube[, , b][!support] <- NA_real_
 
 ## Segment
 
-`use_starlet_mask = FALSE` is deliberate here because the simulated
-support is already encoded by missing values outside the galaxy.
+The simulated galaxy already uses `NA` outside its support, so no
+starlet mask is needed.
 
 ``` r
 seg <- segment_regions(
@@ -93,7 +90,7 @@ knitr::kable(head(regional$flux_long), digits = 4)
 
 ![Six categorical regions and their fixed-seed nine-band regional SEDs.
 Curves are normalised at 2 µm only for shape
-comparison.](../../../../../../private/var/folders/y_/27y51wnx0cz5lf2hsksp1gdc0000gr/T/RtmpfpDjQ8/temp_libpath1358932f7d7eb/sagui/help/figures/sagui-first-run-synthetic-sed.png)
+comparison.](../reference/figures/sagui-first-run-synthetic-sed.png)
 
 Six categorical regions and their fixed-seed nine-band regional SEDs.
 Curves are normalised at 2 µm only for shape comparison.
@@ -102,4 +99,4 @@ Continue with [Prepare
 Photometry](https://rafaelsdesouza.com.br/sagui/articles/preparing-psf-matched-photometry.md)
 for observations, or [Export Regional
 SEDs](https://rafaelsdesouza.com.br/sagui/articles/exporting-regional-seds.md)
-for the downstream data contract.
+to save the results.

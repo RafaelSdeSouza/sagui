@@ -1,8 +1,7 @@
 # Python and Astropy
 
-Sagui’s stable hand-off is a categorical map plus regional photometry
-tables. CSV is portable; FITS is preferable when the spatial WCS must
-travel with the map.
+Sagui returns a categorical map and regional photometry tables. CSV is
+portable; FITS preserves the spatial WCS with the map.
 
 ## Export from R
 
@@ -15,8 +14,8 @@ FITSio::writeFITSim(label_image, file = "region_labels.fits")
 ```
 
 Here, zero means outside support or unassigned; positive integers are
-categorical region identifiers. Add the original spatial FITS header
-when WCS preservation is required.
+categorical region identifiers. Copy the original FITS header to
+preserve the WCS.
 
 ## Read with Python
 
@@ -31,12 +30,11 @@ assert (sed["region"] > 0).all()
 assert labels.ndim == 2
 ```
 
-Use the `region` column to join SED-fitting results back to the map.
-Never assume row order is the region identifier.
+Use the `region` column, rather than row order, to join SED-fitting
+results back to the map.
 
 ## Fit downstream
 
-Sagui does not replace an SED-fitting engine. Pass fluxes,
-uncertainties, filters, redshift assumptions, and calibration terms
-explicitly to the chosen tool, then retain its model configuration with
-the output.
+Sagui does not fit physical SED models. Pass its regional fluxes and
+uncertainties, together with the filters and redshift, to the fitting
+code.

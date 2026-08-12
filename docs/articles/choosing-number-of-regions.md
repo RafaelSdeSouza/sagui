@@ -24,16 +24,11 @@ selected <- choose_ncomp_by_snr(
 selected$snr_grid
 ```
 
-The variance cube and wavelength range define the meaning of the S/N
-threshold; preserve both with the result. A fallback error estimate is a
-quick diagnostic, not a replacement for calibrated uncertainty
-propagation.
+The S/N depends on the variance cube and wavelength range. A fallback
+error estimate is useful for inspection, but it does not replace
+calibrated uncertainties.
 
 ## Stability
 
-Inspect neighbouring candidate counts and check whether the structures
-used in the scientific interpretation persist. Record the accepted rule
-before examining downstream model fits where practical.
-
-The real Sagui-10 target-S/N products are listed in [Paper
-Examples](https://rafaelsdesouza.com.br/sagui/articles/paper-examples-reproduction.html#target-sn-selection).
+Compare neighbouring candidate counts and check whether the structures
+of interest persist.

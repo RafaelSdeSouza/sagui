@@ -13,8 +13,7 @@ resolution.
 4.  Keep the band order and effective wavelengths together.
 5.  Record missing-data and foreground-mask conventions.
 
-Sagui does not perform PSF matching. That preparation belongs upstream,
-where survey-specific calibration and kernels can be inspected.
+Sagui does not perform image registration or PSF matching.
 
 ## Assemble the cube
 
@@ -27,8 +26,8 @@ stopifnot(length(unique(lapply(planes, dim))) == 1L)
 cube <- simplify2array(planes)
 ```
 
-Apply exactly the same geometric operations to the variance planes.
-Never use display-stretched pixels for flux measurement.
+Apply the same geometric operations to the variance planes. Measure
+fluxes from the calibrated images, not display stretches.
 
 ## Validate
 
@@ -38,7 +37,5 @@ stopifnot(dim(cube)[3] == length(bands))
 stopifnot(all(dim(var_cube) == dim(cube)))
 ```
 
-The [Support
-Masks](https://rafaelsdesouza.com.br/sagui/articles/support-mask-construction.md)
-guide begins once the cube, variance, wavelengths, WCS, and PSF target
-are explicit.
+Next, define the pixels to segment with a [support
+mask](https://rafaelsdesouza.com.br/sagui/articles/support-mask-construction.md).

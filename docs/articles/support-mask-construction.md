@@ -1,7 +1,7 @@
 # Support Masks
 
 A support mask decides which pixels are eligible for segmentation. It is
-not a region map and it does not encode physical ordering.
+not a segmentation map.
 
 ## Starlet support
 
@@ -19,8 +19,8 @@ support <- build_starlet_mask(
 image(support$mask)
 ```
 
-Record the collapse function, scale range, threshold, and cleanup
-settings. Changing them changes the eligible footprint.
+The support depends on the collapse function, scale range, threshold,
+and cleanup settings.
 
 ## Adaptive support
 
@@ -32,12 +32,12 @@ represents the source adequately.
 support <- build_adaptive_support(cube, pretransform = "none")
 ```
 
-Directional contourlet support is available but remains a more
-experimental choice. Inspect its directional response and compare it
-with a neutral support before drawing scientific conclusions.
+For directional structures,
+[`build_contourlet_mask()`](https://rafaelsdesouza.com.br/sagui/reference/build_contourlet_mask.md)
+provides an alternative to starlets. Compare both masks before
+segmentation.
 
 ## Background values
 
-Use `FALSE` in a logical support and `NA` or zero only according to the
-downstream function’s documented convention. The segmentation functions
-return unassigned background as `NA` in `cluster_map`.
+Use `FALSE` in a logical support. The segmentation functions return
+unassigned background as `NA` in `cluster_map`.

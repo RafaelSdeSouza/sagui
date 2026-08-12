@@ -1,7 +1,7 @@
 # Export Regional SEDs
 
-Measure regional SEDs on the flux cube intended for science, using the
-categorical label map learned from the segmentation representation.
+Measure regional SEDs from the calibrated flux cube, using the
+segmentation map to group pixels.
 
 ## Extract
 
@@ -25,11 +25,10 @@ write.csv(regional$flux_long, "regional_seds_long.csv", row.names = FALSE)
 write.csv(regional$flux_wide, "regional_seds_wide.csv", row.names = FALSE)
 ```
 
-Store a provenance record beside the tables: input cube, variance cube,
-band axis, PSF target, support settings, segmentation settings, random
-seed where applicable, package version, and output paths.
+Save the band axis, PSF target, support mask, and segmentation
+parameters with the tables.
 
 ## Keep labels intact
 
 Do not renumber labels between the map and the table unless the mapping
-is also written. Region identifiers are join keys, not measurements.
+is also saved. The label numbers only identify regions.

@@ -2,7 +2,7 @@
 
 ### Start
 
-- [Getting
+- [Get
   Started](https://rafaelsdesouza.com.br/sagui/articles/getting-started.md):
 
 ### Prepare
@@ -26,7 +26,6 @@
 - [Python and
   Astropy](https://rafaelsdesouza.com.br/sagui/articles/python-astropy-handoff.md):
 
-### Reproduce
+### Example
 
-- [Paper
-  Examples](https://rafaelsdesouza.com.br/sagui/articles/paper-examples-reproduction.md):
+- [Bagpipes](https://rafaelsdesouza.com.br/sagui/articles/paper-examples-reproduction.md):
