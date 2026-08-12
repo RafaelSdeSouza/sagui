@@ -19,8 +19,7 @@ the same sky footprint and effective angular resolution.
 4. Keep the band order and effective wavelengths together.
 5. Record missing-data and foreground-mask conventions.
 
-Sagui does not perform PSF matching. That preparation belongs upstream, where
-survey-specific calibration and kernels can be inspected.
+Sagui does not perform image registration or PSF matching.
 
 ## Assemble the cube
 
@@ -44,5 +43,4 @@ stopifnot(dim(cube)[3] == length(bands))
 stopifnot(all(dim(var_cube) == dim(cube)))
 ```
 
-The [Support Masks](support-mask-construction.html) guide begins once the cube,
-variance, wavelengths, WCS, and PSF target are explicit.
+Next, define the pixels to segment with a [support mask](support-mask-construction.html).

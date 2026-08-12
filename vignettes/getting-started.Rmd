@@ -1,5 +1,5 @@
 ---
-title: "Getting Started"
+title: "Get Started"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Getting Started}
@@ -12,9 +12,8 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", warning = FALSE, message 
 library(sagui)
 ```
 
-Sagui separates four operations: prepare a common multiband cube, construct a
-spatial support, assign categorical regions, and measure regional SEDs. Keeping
-those operations explicit makes the result easier to reproduce.
+Sagui prepares a common multiband cube, constructs a spatial support, assigns
+categorical regions, and measures their integrated SEDs.
 
 ## Install
 
@@ -26,8 +25,8 @@ library(sagui)
 
 ## Simulate a galaxy
 
-This fixed-seed example mixes bulge, disc, and two knot profiles in nine bands.
-It is an API demonstration, not an observation or a physical inference.
+This fixed-seed simulation mixes bulge, disc, and two knot profiles in nine
+bands.
 
 ```{r simulate}
 set.seed(42)
@@ -61,8 +60,8 @@ for (b in seq_along(bands)) cube[, , b][!support] <- NA_real_
 
 ## Segment
 
-`use_starlet_mask = FALSE` is deliberate here because the simulated support is
-already encoded by missing values outside the galaxy.
+The simulated galaxy already uses `NA` outside its support, so no starlet mask
+is needed.
 
 ```{r segment}
 seg <- segment_regions(
@@ -90,15 +89,19 @@ knitr::kable(head(regional$flux_long), digits = 4)
 ```
 
 ```{r first-run-figure, echo=FALSE, out.width="100%", fig.cap="Six categorical regions and their fixed-seed nine-band regional SEDs. Curves are normalised at 2 µm only for shape comparison."}
-figure_path <- system.file(
-  "help",
-  "figures",
-  "sagui-first-run-synthetic-sed.png",
-  package = "sagui"
-)
+input_file <- knitr::current_input(dir = TRUE)
+figure_path <- if (is.null(input_file)) {
+  system.file(
+    "help", "figures", "sagui-first-run-synthetic-sed.png",
+    package = "sagui"
+  )
+} else {
+  file.path(dirname(input_file), "..", "man", "figures",
+            "sagui-first-run-synthetic-sed.png")
+}
 knitr::include_graphics(figure_path)
 ```
 
 Continue with [Prepare Photometry](preparing-psf-matched-photometry.html) for
-observations, or [Export Regional SEDs](exporting-regional-seds.html) for the
-downstream data contract.
+observations, or [Export Regional SEDs](exporting-regional-seds.html) to save
+the results.

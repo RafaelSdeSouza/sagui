@@ -23,7 +23,7 @@ home:
 
 navbar:
   structure:
-    left: [get-started, user-guide, examples, reference, paper, github]
+    left: [get-started, user-guide, bagpipes, reference, paper, github]
     right: [search, lightswitch]
   components:
     get-started:
@@ -44,8 +44,8 @@ navbar:
           href: articles/exporting-regional-seds.html
         - text: Python and Astropy
           href: articles/python-astropy-handoff.html
-    examples:
-      text: Examples
+    bagpipes:
+      text: Bagpipes
       href: articles/paper-examples-reproduction.html
     reference:
       text: Reference
@@ -73,7 +73,7 @@ articles:
     contents:
       - exporting-regional-seds
       - python-astropy-handoff
-  - title: Reproduce
+  - title: Example
     contents:
       - paper-examples-reproduction
 

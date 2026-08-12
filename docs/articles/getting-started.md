@@ -93,7 +93,7 @@ knitr::kable(head(regional$flux_long), digits = 4)
 
 ![Six categorical regions and their fixed-seed nine-band regional SEDs.
 Curves are normalised at 2 µm only for shape
-comparison.](../reference/figures/sagui-first-run-synthetic-sed.png)
+comparison.](../../../../../../private/var/folders/y_/27y51wnx0cz5lf2hsksp1gdc0000gr/T/RtmpfpDjQ8/temp_libpath1358932f7d7eb/sagui/help/figures/sagui-first-run-synthetic-sed.png)
 
 Six categorical regions and their fixed-seed nine-band regional SEDs.
 Curves are normalised at 2 µm only for shape comparison.

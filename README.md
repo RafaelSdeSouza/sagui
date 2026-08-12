@@ -33,10 +33,9 @@ library(sagui)
 
 ## Quick start {#quick-start}
 
-This deterministic example simulates a small resolved galaxy in nine
-near-infrared bands. Its pixels mix bulge, disc, and two star-forming-knot SED
-profiles inside an elliptical support. The simulation is illustrative; it is
-not an observational data product.
+This example simulates a small resolved galaxy in nine near-infrared bands.
+Its pixels mix bulge, disc, and two star-forming-knot SED profiles inside an
+elliptical support.
 
 ```r
 set.seed(42)
@@ -89,7 +88,7 @@ regional <- extract_region_sed(
   <figcaption>A fixed-seed, nine-band simulation. The left panel shows categorical regions; the right panel shows flux-preserving regional SED shapes normalised at 2 micrometres for comparison.</figcaption>
 </figure>
 
-The regional table is the hand-off product for downstream fitting:
+The output contains the integrated photometry for each region:
 
 ```r
 head(regional$flux_long[c("region", "lambda", "flux", "flux_err", "n_pix")])
@@ -101,25 +100,21 @@ head(regional$flux_long[c("region", "lambda", "flux", "flux_err", "n_pix")])
 | 1 | 1.15 | 57.4866 | 0.1235 | 106 |
 | 1 | 1.50 | 62.6675 | 0.1235 | 106 |
 
-These are deterministic simulation outputs, not observational measurements.
-
 ## Continue
 
 - [Prepare PSF-matched photometry](articles/preparing-psf-matched-photometry.html)
 - [Choose a region count](articles/choosing-number-of-regions.html)
 - [Export regional SEDs](articles/exporting-regional-seds.html)
-- [Reproduce the paper examples](articles/paper-examples-reproduction.html)
+- [Fit a regional SED with Bagpipes](articles/paper-examples-reproduction.html)
 
 ## Core API {#core-api}
 
 Use [`segment_regions()`](reference/segment_regions.html) for exact Ward
 clustering and [`segment_regions_large()`](reference/segment_regions_large.html)
 when the all-pairs distance matrix is too large. Both return the categorical
-region map and provenance-relevant settings used by the segmentation.
+region map and the parameters used for the segmentation.
 
 ## About {#about}
 
 Sagui is part of the [COIN Toolbox](https://cosmostatistics-initiative.org/).
-Please cite the software paper with `citation("sagui")`. Limitations and the
-status of each paper-reproduction asset are stated in the
-[examples guide](articles/paper-examples-reproduction.html).
+Please cite the software paper with `citation("sagui")`.

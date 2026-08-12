@@ -7,7 +7,7 @@ or reproduced without its original data access and calibration context.
 ## Sagui-10
 
 ![Sagui-10 photometric SED segmentation. Colours are categorical region
-labels.](../reference/figures/sagui10_n20.png)
+labels.](../../../../../../private/var/folders/y_/27y51wnx0cz5lf2hsksp1gdc0000gr/T/RtmpfpDjQ8/temp_libpath1358932f7d7eb/sagui/help/figures/sagui10_n20.png)
 
 Sagui-10 photometric SED segmentation. Colours are categorical region
 labels.
@@ -18,20 +18,20 @@ the provenance table before treating it as reproducible from public
 inputs alone.
 
 ![Regional SED fit retained with the Sagui-10
-example.](../reference/figures/sagui10_sedfit_region_1.png)
+example.](../../../../../../private/var/folders/y_/27y51wnx0cz5lf2hsksp1gdc0000gr/T/RtmpfpDjQ8/temp_libpath1358932f7d7eb/sagui/help/figures/sagui10_sedfit_region_1.png)
 
 Regional SED fit retained with the Sagui-10 example.
 
 ## Faint bridge
 
 ![Sagui-11 low-surface-brightness composite and copula-pretransformed
-segmentation.](../reference/figures/sagui11_lsb_composite.png)
+segmentation.](../../../../../../private/var/folders/y_/27y51wnx0cz5lf2hsksp1gdc0000gr/T/RtmpfpDjQ8/temp_libpath1358932f7d7eb/sagui/help/figures/sagui11_lsb_composite.png)
 
 Sagui-11 low-surface-brightness composite and copula-pretransformed
 segmentation.
 
 ![Sagui-11 low-surface-brightness composite and copula-pretransformed
-segmentation.](../reference/figures/sagui11_lsb_copula.png)
+segmentation.](../../../../../../private/var/folders/y_/27y51wnx0cz5lf2hsksp1gdc0000gr/T/RtmpfpDjQ8/temp_libpath1358932f7d7eb/sagui/help/figures/sagui11_lsb_copula.png)
 
 Sagui-11 low-surface-brightness composite and copula-pretransformed
 segmentation.
@@ -43,7 +43,7 @@ bridge.
 ## Target S/N
 
 ![Sagui-10 candidate selected under a minimum regional S/N threshold of
-10.](../reference/figures/sagui10_target_snr_10.png)
+10.](../../../../../../private/var/folders/y_/27y51wnx0cz5lf2hsksp1gdc0000gr/T/RtmpfpDjQ8/temp_libpath1358932f7d7eb/sagui/help/figures/sagui10_target_snr_10.png)
 
 Sagui-10 candidate selected under a minimum regional S/N threshold of
 10.
@@ -56,7 +56,8 @@ together with the variance model and candidate grid.
 ## Bagpipes hand-off
 
 ![Bagpipes model photometry for Sagui-8 region 8, generated from a Sagui
-regional SED.](../reference/figures/sagui8_region8_bagpipes_sedfit.png)
+regional
+SED.](../../../../../../private/var/folders/y_/27y51wnx0cz5lf2hsksp1gdc0000gr/T/RtmpfpDjQ8/temp_libpath1358932f7d7eb/sagui/help/figures/sagui8_region8_bagpipes_sedfit.png)
 
 Bagpipes model photometry for Sagui-8 region 8, generated from a Sagui
 regional SED.
