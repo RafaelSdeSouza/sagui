@@ -1,0 +1,47 @@
+# SED Segmentation
+
+Sagui clusters one photometric SED per supported pixel. Support
+construction, clustering transforms, and flux measurement remain
+separate.
+
+## Exact Ward
+
+``` r
+seg <- segment_regions(
+  input = cube,
+  Ncomp = 20,
+  use_starlet_mask = TRUE,
+  cluster_pretransform = "none"
+)
+```
+
+Exact Ward clustering stores all pairwise distances. Use it only when
+the supported pixel count fits available memory.
+
+## Sparse Ward
+
+``` r
+seg <- segment_regions_large(
+  input = cube,
+  Ncomp = 20,
+  use_starlet_mask = TRUE,
+  cluster_pretransform = "none",
+  knn_k = 40,
+  auto_k = FALSE
+)
+```
+
+The sparse backend restricts candidate merges to a nearest-neighbour
+graph. Record `knn_k`, `auto_k`, the support, and every transform
+alongside the result.
+
+## Choose transforms
+
+Use `cluster_pretransform`, not the deprecated `pretransform` alias. The
+default `"none"` preserves the input representation. Alternatives such
+as `"copula_gaussian"` change the clustering geometry and should be
+justified and tested as analysis choices.
+
+Region labels are categorical. Never map their integer values to an
+ordered colour scale or interpret a larger label as a larger physical
+quantity.

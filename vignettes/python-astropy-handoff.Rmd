@@ -1,0 +1,48 @@
+---
+title: "Python and Astropy"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Python and Astropy}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Sagui's stable hand-off is a categorical map plus regional photometry tables.
+CSV is portable; FITS is preferable when the spatial WCS must travel with the
+map.
+
+## Export from R
+
+```{r r-export, eval=FALSE}
+write.csv(regional$flux_long, "regional_seds_long.csv", row.names = FALSE)
+
+label_image <- seg$cluster_map
+label_image[is.na(label_image)] <- 0L
+FITSio::writeFITSim(label_image, file = "region_labels.fits")
+```
+
+Here, zero means outside support or unassigned; positive integers are
+categorical region identifiers. Add the original spatial FITS header when WCS
+preservation is required.
+
+## Read with Python
+
+```python
+import pandas as pd
+from astropy.io import fits
+
+sed = pd.read_csv("regional_seds_long.csv")
+labels = fits.getdata("region_labels.fits")
+
+assert (sed["region"] > 0).all()
+assert labels.ndim == 2
+```
+
+Use the `region` column to join SED-fitting results back to the map. Never
+assume row order is the region identifier.
+
+## Fit downstream
+
+Sagui does not replace an SED-fitting engine. Pass fluxes, uncertainties,
+filters, redshift assumptions, and calibration terms explicitly to the chosen
+tool, then retain its model configuration with the output.

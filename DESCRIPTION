@@ -9,6 +9,8 @@ Description: Provides tools for photometry, segmentation, visualization, and
     robust summary statistics on hyperspectral and integral-field spectroscopic
     (IFU) data cubes. Includes utilities for region-based flux integration,
     background estimation, variance-aware summaries, and multiscale masking.
+URL: https://rafaelsdesouza.com.br/sagui/, https://github.com/RafaelSdeSouza/sagui
+BugReports: https://github.com/RafaelSdeSouza/sagui/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1.0)
@@ -27,12 +29,16 @@ Imports:
 LinkingTo:
     Rcpp
 Suggests:
+    cowplot,
     EBImage,
     fastcluster,
     imager,
     imagerExtra,
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0),
     torch
+VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3

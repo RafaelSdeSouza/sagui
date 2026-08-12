@@ -1,0 +1,25 @@
+Sagui Phase B website preflight
+
+Repository: /Users/rd23aag/Documents/GitHub/sagui
+Branch: main
+HEAD before Phase B: bb5a56f1c15a84e6a48373866fd528f5c67faf48
+Existing publication path: Quarto render to _site followed by GitHub Pages deployment
+
+Pre-existing working-tree changes preserved:
+ M .Rproj.user/46E01796/pcs/source-pane.pper
+ M .Rproj.user/46E01796/pcs/windowlayoutstate.pper
+ M .Rproj.user/46E01796/pcs/workbench-pane.pper
+ M .Rproj.user/46E01796/persistent-state
+ M scripts/run_clump_candidates.R
+?? .Rhistory
+
+Toolchain observed:
+- R 4.5.2
+- pkgdown 2.2.0
+- Quarto 1.8.27
+- Pandoc 3.6.3
+- rmarkdown 2.30
+- knitr 1.51
+- xml2 1.5.2
+
+No Phase B target file overlapped the pre-existing modified files.

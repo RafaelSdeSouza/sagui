@@ -1,0 +1,291 @@
+# Sagui ![Sagui package logo](reference/figures/sagui_upscaled.png)
+
+Photometric SED segmentation for resolved galaxies.
+
+Sagui turns a PSF-matched multiband cube into spatially coherent regions
+and flux-preserving regional spectral energy distributions (SEDs). It
+supports exact Ward clustering for compact data and sparse-graph Ward
+clustering for larger images.
+
+The methods and first applications are described by de Souza et
+al. (2026), [*sagui: SED-based segmentation of multiband Galaxy images –
+application to JADES in
+GOODS-South*](https://doi.org/10.1093/mnras/stag1062),
+[arXiv:2604.18812](https://arxiv.org/abs/2604.18812).
+
+![A manuscript mosaic of six resolved galaxies, each paired with a
+categorical Sagui photometric SED segmentation
+map](reference/figures/sagui_segmentation_mosaic.png)
+
+Real manuscript examples. Region colours are categorical labels, not an
+ordered physical scale.
+
+1.  **Prepare**Align the images, match the PSF, and assemble the band
+    axis.
+2.  **Support**Define which pixels belong to the astronomical source.
+3.  **Segment**Group photometric SEDs with exact or sparse Ward
+    clustering.
+4.  **Measure**Export regional fluxes and uncertainties for SED fitting.
+
+## Install
+
+``` r
+install.packages("remotes")
+remotes::install_github("RafaelSdeSouza/sagui")
+library(sagui)
+```
+
+## Quick start
+
+This deterministic example simulates a small resolved galaxy in nine
+near-infrared bands. Its pixels mix bulge, disc, and two
+star-forming-knot SED profiles inside an elliptical support. The
+simulation is illustrative; it is not an observational data product.
+
+``` r
+set.seed(42)
+
+bands <- c(0.90, 1.15, 1.50, 1.82, 2.00, 2.77, 3.56, 4.10, 4.44)
+nx <- ny <- 24L
+xy <- expand.grid(x = seq_len(nx), y = seq_len(ny))
+dx <- xy$x - 12.5
+dy <- xy$y - 12.5
+radius <- sqrt((dx / 1.10)^2 + (dy / 0.78)^2)
+support <- matrix((dx / 11)^2 + (dy / 8.3)^2 <= 1, nx, ny)
+
+profiles <- rbind(
+  bulge = c(0.58, 0.78, 1.02, 1.16, 1.14, 0.98, 0.82, 0.72, 0.66),
+  disc  = c(0.82, 0.94, 1.04, 1.08, 1.05, 0.92, 0.84, 0.78, 0.74),
+  knot1 = c(1.18, 1.11, 1.02, 0.96, 0.93, 0.88, 0.98, 0.91, 0.86),
+  knot2 = c(1.08, 1.04, 0.99, 0.95, 0.94, 0.91, 1.05, 0.99, 0.93)
+)
+
+weights <- cbind(
+  exp(-(radius / 3.0)^2),
+  exp(-radius / 8.5),
+  exp(-((dx - 4.5)^2 + (dy + 1.8)^2) / 5),
+  exp(-((dx + 4.0)^2 + (dy - 2.6)^2) / 6)
+)
+weights <- weights / rowSums(weights)
+surface_brightness <- 0.12 + 1.35 * exp(-radius / 8)
+flux <- surface_brightness * (weights %*% profiles)
+flux <- flux + matrix(rnorm(length(flux), sd = 0.012), nrow(flux))
+cube <- array(flux, dim = c(nx, ny, length(bands)))
+for (b in seq_along(bands)) cube[, , b][!support] <- NA_real_
+
+seg <- segment_regions(
+  input = cube,
+  Ncomp = 6,
+  use_starlet_mask = FALSE,
+  cluster_pretransform = "none"
+)
+
+regional <- extract_region_sed(
+  cube = cube,
+  labels = seg$cluster_map,
+  band_values = bands,
+  sigma_band = rep(0.012, length(bands))
+)
+```
+
+![Synthetic Sagui example showing six categorical galaxy regions beside
+their normalized nine-band regional SEDs with uncertainty
+bars](reference/figures/sagui-first-run-synthetic-sed.png)
+
+A fixed-seed, nine-band simulation. The left panel shows categorical
+regions; the right panel shows flux-preserving regional SED shapes
+normalised at 2 micrometres for comparison.
+
+The regional table is the hand-off product for downstream fitting:
+
+``` r
+head(regional$flux_long[c("region", "lambda", "flux", "flux_err", "n_pix")])
+```
+
+| region | lambda (µm) |    flux | flux error | pixels |
+|-------:|------------:|--------:|-----------:|-------:|
+|      1 |        0.90 | 51.3139 |     0.1235 |    106 |
+|      1 |        1.15 | 57.4866 |     0.1235 |    106 |
+|      1 |        1.50 | 62.6675 |     0.1235 |    106 |
+
+These are deterministic simulation outputs, not observational
+measurements.
+
+## Continue
+
+- [Prepare PSF-matched
+  photometry](https://rafaelsdesouza.com.br/sagui/articles/preparing-psf-matched-photometry.md)
+- [Choose a region
+  count](https://rafaelsdesouza.com.br/sagui/articles/choosing-number-of-regions.md)
+- [Export regional
+  SEDs](https://rafaelsdesouza.com.br/sagui/articles/exporting-regional-seds.md)
+- [Reproduce the paper
+  examples](https://rafaelsdesouza.com.br/sagui/articles/paper-examples-reproduction.md)
+
+## Core API
+
+Use
+[`segment_regions()`](https://rafaelsdesouza.com.br/sagui/reference/segment_regions.md)
+for exact Ward clustering and
+[`segment_regions_large()`](https://rafaelsdesouza.com.br/sagui/reference/segment_regions_large.md)
+when the all-pairs distance matrix is too large. Both return the
+categorical region map and provenance-relevant settings used by the
+segmentation.
+
+## About
+
+Sagui is part of the [COIN
+Toolbox](https://cosmostatistics-initiative.org/). Please cite the
+software paper with `citation("sagui")`. Limitations and the status of
+each paper-reproduction asset are stated in the [examples
+guide](https://rafaelsdesouza.com.br/sagui/articles/paper-examples-reproduction.md).
+
+# Package index
+
+## Core segmentation
+
+Exact and sparse photometric SED segmentation, plus region-count
+selection.
+
+- [`segment_regions()`](https://rafaelsdesouza.com.br/sagui/reference/segment_regions.md)
+  : Segment photometric regions from a spectral cube
+- [`segment_regions_large()`](https://rafaelsdesouza.com.br/sagui/reference/segment_regions_large.md)
+  : Segment photometric regions from large spectral cubes
+- [`choose_ncomp_by_snr()`](https://rafaelsdesouza.com.br/sagui/reference/choose_ncomp_by_snr.md)
+  : Choose the Number of SAGUI Regions from a Target S/N
+
+## Photometry preparation
+
+Cube conversion, display transforms, masking, and spectrum transforms.
+
+- [`cube_to_matrix()`](https://rafaelsdesouza.com.br/sagui/reference/cube_to_matrix.md)
+  : Flatten a spectral cube into a pixel-by-band matrix
+- [`collapse_white_light()`](https://rafaelsdesouza.com.br/sagui/reference/collapse_white_light.md)
+  : Collapse a spectral cube into a white-light image (robust, weighted)
+- [`mask_cube()`](https://rafaelsdesouza.com.br/sagui/reference/mask_cube.md)
+  : Mask a 3D cube by a spatial label map
+- [`pretransform_cube()`](https://rafaelsdesouza.com.br/sagui/reference/pretransform_cube.md)
+  : Apply a spectral pretransform to a full cube
+- [`pretransform_spectra()`](https://rafaelsdesouza.com.br/sagui/reference/pretransform_spectra.md)
+  : Apply a spectral pretransform before segmentation
+- [`median_scale()`](https://rafaelsdesouza.com.br/sagui/reference/median_scale.md)
+  : Center a spectrum by its median
+- [`asinh_stretch()`](https://rafaelsdesouza.com.br/sagui/reference/asinh_stretch.md)
+  : Asinh-stretch an image or numeric array
+
+## Support construction
+
+Multiscale support builders and mask refinement.
+
+- [`build_starlet_mask()`](https://rafaelsdesouza.com.br/sagui/reference/build_starlet_mask.md)
+  : Build a starlet-based segmentation mask from a spectral cube
+- [`starlet_mask()`](https://rafaelsdesouza.com.br/sagui/reference/starlet_mask.md)
+  : Starlet (à trous) decomposition
+- [`starlet_reconstruct()`](https://rafaelsdesouza.com.br/sagui/reference/starlet_reconstruct.md)
+  : Reconstruct from a subset of starlet scales
+- [`b3_kernel()`](https://rafaelsdesouza.com.br/sagui/reference/b3_kernel.md)
+  : B3-spline low-pass kernel (1D)
+- [`upsample_kernel()`](https://rafaelsdesouza.com.br/sagui/reference/upsample_kernel.md)
+  : Insert zeros between kernel taps
+- [`build_adaptive_support()`](https://rafaelsdesouza.com.br/sagui/reference/build_adaptive_support.md)
+  : Build an adaptive multi-band support mask
+- [`build_contourlet_mask()`](https://rafaelsdesouza.com.br/sagui/reference/build_contourlet_mask.md)
+  : Build a contourlet-like directional support mask from a spectral
+  cube
+- [`clean_segmentation_mask()`](https://rafaelsdesouza.com.br/sagui/reference/clean_segmentation_mask.md)
+  : Clean a logical segmentation support mask
+- [`threshold_starlet_regions()`](https://rafaelsdesouza.com.br/sagui/reference/threshold_starlet_regions.md)
+  : Reconstruct and threshold starlet scales to produce a region mask
+
+## Regional SED products
+
+Flux-preserving regional photometry and background summaries.
+
+- [`RegionPhotometry()`](https://rafaelsdesouza.com.br/sagui/reference/RegionPhotometry.md)
+  : Region-level photometry on hyperspectral cubes (no background
+  subtraction)
+- [`extract_region_sed()`](https://rafaelsdesouza.com.br/sagui/reference/extract_region_sed.md)
+  : Extract integrated SEDs for segmented regions
+- [`summarize_region_sed()`](https://rafaelsdesouza.com.br/sagui/reference/summarize_region_sed.md)
+  : Summarize integrated SEDs for segmented regions
+- [`estimate_bkg_mad_per_lambda()`](https://rafaelsdesouza.com.br/sagui/reference/estimate_bkg_mad_per_lambda.md)
+  : Robust per-wavelength background and scatter
+
+## Maps and post-processing
+
+Categorical maps, region properties, relabelling, and smoothing.
+
+- [`plot_region_map()`](https://rafaelsdesouza.com.br/sagui/reference/plot_region_map.md)
+  : Plot a segmented region map with dissolved Voronoi-style polygons
+- [`plot_region_property_map()`](https://rafaelsdesouza.com.br/sagui/reference/plot_region_property_map.md)
+  : Plot a region property map in Voronoi-style polygons
+- [`plot_region_property_raster()`](https://rafaelsdesouza.com.br/sagui/reference/plot_region_property_raster.md)
+  : Plot a region property map on a pixel grid
+- [`reindex_regions()`](https://rafaelsdesouza.com.br/sagui/reference/reindex_regions.md)
+  : Reindex positive region labels to a compact sequence
+- [`fill_region_holes()`](https://rafaelsdesouza.com.br/sagui/reference/fill_region_holes.md)
+  : Fill zero-valued holes inside each labeled region
+- [`filter_regions_by_size()`](https://rafaelsdesouza.com.br/sagui/reference/filter_regions_by_size.md)
+  : Filter regions by pixel count
+- [`reject_background_regions()`](https://rafaelsdesouza.com.br/sagui/reference/reject_background_regions.md)
+  : Reject background-like regions after segmentation
+- [`smooth_region_field_laplacian()`](https://rafaelsdesouza.com.br/sagui/reference/smooth_region_field_laplacian.md)
+  : Smooth region values over an adjacency graph
+
+## Clump candidates
+
+Optional candidate detection and diagnostic helpers.
+
+- [`detect_sed_clumps()`](https://rafaelsdesouza.com.br/sagui/reference/detect_sed_clumps.md)
+  : Detect compact SED-clump seeds
+- [`segment_clumps()`](https://rafaelsdesouza.com.br/sagui/reference/segment_clumps.md)
+  : Segment compact SED clumps and the diffuse galaxy body
+- [`segment_clump_profiles()`](https://rafaelsdesouza.com.br/sagui/reference/segment_clump_profiles.md)
+  : Split clump footprints into internal profile regions
+- [`compute_clump_score()`](https://rafaelsdesouza.com.br/sagui/reference/compute_clump_score.md)
+  : Compute a compact SED-clump score
+- [`clump_evidence_table()`](https://rafaelsdesouza.com.br/sagui/reference/clump_evidence_table.md)
+  : Summarise evidence for candidate clumps
+- [`grow_clump_footprints()`](https://rafaelsdesouza.com.br/sagui/reference/grow_clump_footprints.md)
+  : Grow clump seeds into compact footprints
+- [`plot_clump_diagnostics()`](https://rafaelsdesouza.com.br/sagui/reference/plot_clump_diagnostics.md)
+  : Plot clump-segmentation diagnostics
+
+## Package
+
+- [`sagui`](https://rafaelsdesouza.com.br/sagui/reference/sagui-package.md)
+  [`sagui-package`](https://rafaelsdesouza.com.br/sagui/reference/sagui-package.md)
+  : sagui
+
+# Articles
+
+### Start
+
+- [Getting
+  Started](https://rafaelsdesouza.com.br/sagui/articles/getting-started.md):
+
+### Prepare
+
+- [Prepare
+  Photometry](https://rafaelsdesouza.com.br/sagui/articles/preparing-psf-matched-photometry.md):
+- [Support
+  Masks](https://rafaelsdesouza.com.br/sagui/articles/support-mask-construction.md):
+
+### Segment
+
+- [SED
+  Segmentation](https://rafaelsdesouza.com.br/sagui/articles/photometric-sed-segmentation.md):
+- [Choose Region
+  Count](https://rafaelsdesouza.com.br/sagui/articles/choosing-number-of-regions.md):
+
+### Use products
+
+- [Export Regional
+  SEDs](https://rafaelsdesouza.com.br/sagui/articles/exporting-regional-seds.md):
+- [Python and
+  Astropy](https://rafaelsdesouza.com.br/sagui/articles/python-astropy-handoff.md):
+
+### Reproduce
+
+- [Paper
+  Examples](https://rafaelsdesouza.com.br/sagui/articles/paper-examples-reproduction.md):

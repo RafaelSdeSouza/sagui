@@ -1,14 +1,29 @@
-# sagui <img align="right" src="images/sagui_upscaled.png" width="190" alt="sagui logo">
+# Sagui <img align="right" src="man/figures/sagui_upscaled.png" width="88" alt="Sagui package logo">
 
-Photometric SED-based segmentation for IFU data cubes.
+<p class="lead">Photometric SED segmentation for resolved galaxies.</p>
 
-## Website
+Sagui turns a PSF-matched multiband cube into spatially coherent regions and
+flux-preserving regional spectral energy distributions (SEDs). It supports
+exact Ward clustering for compact data and sparse-graph Ward clustering for
+larger images.
 
-The package website is the main documentation entry point:
+The methods and first applications are described by de Souza et al. (2026),
+[*sagui: SED-based segmentation of multiband Galaxy images – application to JADES in GOODS-South*](https://doi.org/10.1093/mnras/stag1062),
+[arXiv:2604.18812](https://arxiv.org/abs/2604.18812).
 
-- [sagui website](https://rafaelsdesouza.github.io/sagui/)
+<figure>
+  <img src="man/figures/sagui_segmentation_mosaic.png" alt="A manuscript mosaic of six resolved galaxies, each paired with a categorical Sagui photometric SED segmentation map">
+  <figcaption>Real manuscript examples. Region colours are categorical labels, not an ordered physical scale.</figcaption>
+</figure>
 
-## Installation
+<ol class="workflow">
+  <li><strong>Prepare</strong>Align the images, match the PSF, and assemble the band axis.</li>
+  <li><strong>Support</strong>Define which pixels belong to the astronomical source.</li>
+  <li><strong>Segment</strong>Group photometric SEDs with exact or sparse Ward clustering.</li>
+  <li><strong>Measure</strong>Export regional fluxes and uncertainties for SED fitting.</li>
+</ol>
+
+## Install {#installation}
 
 ```r
 install.packages("remotes")
@@ -16,55 +31,95 @@ remotes::install_github("RafaelSdeSouza/sagui")
 library(sagui)
 ```
 
-## Minimal example
+## Quick start {#quick-start}
+
+This deterministic example simulates a small resolved galaxy in nine
+near-infrared bands. Its pixels mix bulge, disc, and two star-forming-knot SED
+profiles inside an elliptical support. The simulation is illustrative; it is
+not an observational data product.
 
 ```r
-library(sagui)
-library(FITSio)
+set.seed(42)
 
-x <- FITSio::readFITS("manga-8135-12701-LOGCUBE.fits")
+bands <- c(0.90, 1.15, 1.50, 1.82, 2.00, 2.77, 3.56, 4.10, 4.44)
+nx <- ny <- 24L
+xy <- expand.grid(x = seq_len(nx), y = seq_len(ny))
+dx <- xy$x - 12.5
+dy <- xy$y - 12.5
+radius <- sqrt((dx / 1.10)^2 + (dy / 0.78)^2)
+support <- matrix((dx / 11)^2 + (dy / 8.3)^2 <= 1, nx, ny)
+
+profiles <- rbind(
+  bulge = c(0.58, 0.78, 1.02, 1.16, 1.14, 0.98, 0.82, 0.72, 0.66),
+  disc  = c(0.82, 0.94, 1.04, 1.08, 1.05, 0.92, 0.84, 0.78, 0.74),
+  knot1 = c(1.18, 1.11, 1.02, 0.96, 0.93, 0.88, 0.98, 0.91, 0.86),
+  knot2 = c(1.08, 1.04, 0.99, 0.95, 0.94, 0.91, 1.05, 0.99, 0.93)
+)
+
+weights <- cbind(
+  exp(-(radius / 3.0)^2),
+  exp(-radius / 8.5),
+  exp(-((dx - 4.5)^2 + (dy + 1.8)^2) / 5),
+  exp(-((dx + 4.0)^2 + (dy - 2.6)^2) / 6)
+)
+weights <- weights / rowSums(weights)
+surface_brightness <- 0.12 + 1.35 * exp(-radius / 8)
+flux <- surface_brightness * (weights %*% profiles)
+flux <- flux + matrix(rnorm(length(flux), sd = 0.012), nrow(flux))
+cube <- array(flux, dim = c(nx, ny, length(bands)))
+for (b in seq_along(bands)) cube[, , b][!support] <- NA_real_
 
 seg <- segment_regions(
-  input = x,
-  Ncomp = 30,
-  use_starlet_mask = TRUE,
-  starlet_J = 5,
-  starlet_scales = 2:5,
-  pretransform = "asinh"
+  input = cube,
+  Ncomp = 6,
+  use_starlet_mask = FALSE,
+  cluster_pretransform = "none"
 )
 
-sed <- extract_region_sed(
-  cube = x,
+regional <- extract_region_sed(
+  cube = cube,
   labels = seg$cluster_map,
-  band_values = FITSio::axVec(3, x$axDat)
+  band_values = bands,
+  sigma_band = rep(0.012, length(bands))
 )
 ```
 
-For larger cubes where exact Ward clustering becomes memory-limited, use the
-sparse-Ward approximation with the same photometric mask and output structure:
+<figure>
+  <img src="man/figures/sagui-first-run-synthetic-sed.png" alt="Synthetic Sagui example showing six categorical galaxy regions beside their normalized nine-band regional SEDs with uncertainty bars">
+  <figcaption>A fixed-seed, nine-band simulation. The left panel shows categorical regions; the right panel shows flux-preserving regional SED shapes normalised at 2 micrometres for comparison.</figcaption>
+</figure>
+
+The regional table is the hand-off product for downstream fitting:
 
 ```r
-seg <- segment_regions_large(
-  input = x,
-  Ncomp = 30,
-  use_starlet_mask = TRUE,
-  pretransform = "asinh",
-  knn_k = 40,
-  scale_fn = identity
-)
+head(regional$flux_long[c("region", "lambda", "flux", "flux_err", "n_pix")])
 ```
 
-`segment_regions_large()` mirrors `segment_regions()` but avoids constructing
-the full all-pairs distance matrix. Use `scale_fn = identity` for raw
-photometry, or `scale_fn = median_scale` to match the default exact workflow.
+| region | lambda (µm) | flux | flux error | pixels |
+|---:|---:|---:|---:|---:|
+| 1 | 0.90 | 51.3139 | 0.1235 | 106 |
+| 1 | 1.15 | 57.4866 | 0.1235 | 106 |
+| 1 | 1.50 | 62.6675 | 0.1235 | 106 |
 
-## Scope
+These are deterministic simulation outputs, not observational measurements.
 
-`sagui` focuses on:
+## Continue
 
-- photometric masking with starlet reconstruction
-- region segmentation of IFU cubes
-- sparse-Ward segmentation for large photometric cubes
-- optional spectral pretransforms for clustering benchmarks
-- integrated region SEDs with uncertainties
-- region-level visualization for downstream fitting
+- [Prepare PSF-matched photometry](articles/preparing-psf-matched-photometry.html)
+- [Choose a region count](articles/choosing-number-of-regions.html)
+- [Export regional SEDs](articles/exporting-regional-seds.html)
+- [Reproduce the paper examples](articles/paper-examples-reproduction.html)
+
+## Core API {#core-api}
+
+Use [`segment_regions()`](reference/segment_regions.html) for exact Ward
+clustering and [`segment_regions_large()`](reference/segment_regions_large.html)
+when the all-pairs distance matrix is too large. Both return the categorical
+region map and provenance-relevant settings used by the segmentation.
+
+## About {#about}
+
+Sagui is part of the [COIN Toolbox](https://cosmostatistics-initiative.org/).
+Please cite the software paper with `citation("sagui")`. Limitations and the
+status of each paper-reproduction asset are stated in the
+[examples guide](articles/paper-examples-reproduction.html).

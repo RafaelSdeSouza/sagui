@@ -230,12 +230,28 @@ label_components <- function(mask, connectivity = 8L) {
   labels
 }
 
-central_body_mask <- function(cube, bands, support = NULL, k = 1.0, q = 0.90) {
+central_body_mask <- function(cube,
+                              bands,
+                              support = NULL,
+                              mode = c("radius", "connected"),
+                              radius = 5,
+                              k = 1.0,
+                              q = 0.90) {
+  mode <- match.arg(mode)
   image <- collapse_bands(cube, bands)
   if (is.null(support)) support <- is.finite(image)
   support <- is.finite(support) & support & is.finite(image)
   values <- image[support]
   if (!length(values)) return(matrix(FALSE, nrow = nrow(image), ncol = ncol(image)))
+
+  peak <- which(ifelse(support, image, NA_real_) == max(image[support], na.rm = TRUE), arr.ind = TRUE)
+  peak <- peak[1, , drop = FALSE]
+  if (identical(mode, "radius")) {
+    rr <- row(image) - peak[1]
+    cc <- col(image) - peak[2]
+    radius <- max(0, as.numeric(radius))
+    return(support & sqrt(rr^2 + cc^2) <= radius)
+  }
 
   bg <- stats::median(values, na.rm = TRUE)
   sig <- stats::mad(values, center = bg, constant = 1.4826, na.rm = TRUE)
@@ -246,8 +262,6 @@ central_body_mask <- function(cube, bands, support = NULL, k = 1.0, q = 0.90) {
   if (!any(bright, na.rm = TRUE)) return(matrix(FALSE, nrow = nrow(image), ncol = ncol(image)))
 
   labels <- label_components(bright, connectivity = 8L)
-  peak <- which(ifelse(support, image, NA_real_) == max(image[support], na.rm = TRUE), arr.ind = TRUE)
-  peak <- peak[1, , drop = FALSE]
   peak_label <- labels[peak[1], peak[2]]
   if (!is.finite(peak_label) || is.na(peak_label)) {
     tab <- sort(table(labels[is.finite(labels)]), decreasing = TRUE)
@@ -267,6 +281,14 @@ plot_rgb_clump_candidates <- function(seg,
   show_labels = TRUE,
   label_size = 3.4) {
   bg <- make_rgb_background(cube, red_bands, green_bands, blue_bands)
+  if (!all(c("clump_id", "accepted", "quality") %in% names(quality))) {
+    quality <- data.frame(
+      clump_id = integer(),
+      accepted = logical(),
+      quality = character(),
+      stringsAsFactors = FALSE
+    )
+  }
   accepted_ids <- quality$clump_id[quality$accepted %in% TRUE]
 
   labels <- seg$clump_footprints$clump_labels
@@ -437,6 +459,8 @@ central_reject <- if (exclude_central) {
     cube_psf$imDat,
     bands = bands,
     support = support,
+    mode = env_chr("SAGUI_CENTRAL_BODY_MODE", "radius"),
+    radius = env_num("SAGUI_CENTRAL_BODY_RADIUS", 5),
     k = env_num("SAGUI_CENTRAL_BODY_K", 1.0),
     q = env_num("SAGUI_CENTRAL_BODY_Q", 0.90)
   )

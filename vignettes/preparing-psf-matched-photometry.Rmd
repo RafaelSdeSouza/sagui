@@ -1,0 +1,48 @@
+---
+title: "Prepare Photometry"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Prepare Photometry}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Sagui expects a numeric array with dimensions `[x, y, band]`, or a FITS-like
+list with that array in `imDat`. Before segmentation, every band should refer to
+the same sky footprint and effective angular resolution.
+
+## Required checks
+
+1. Register every image to one pixel grid and WCS.
+2. Match all bands to a declared target PSF.
+3. Convert fluxes and uncertainties to compatible units.
+4. Keep the band order and effective wavelengths together.
+5. Record missing-data and foreground-mask conventions.
+
+Sagui does not perform PSF matching. That preparation belongs upstream, where
+survey-specific calibration and kernels can be inspected.
+
+## Assemble the cube
+
+```{r assemble, eval=FALSE}
+band_files <- c("F090W.fits", "F150W.fits", "F200W.fits", "F356W.fits")
+bands <- c(0.90, 1.50, 2.00, 3.56)
+
+planes <- lapply(band_files, function(path) FITSio::readFITS(path)$imDat)
+stopifnot(length(unique(lapply(planes, dim))) == 1L)
+cube <- simplify2array(planes)
+```
+
+Apply exactly the same geometric operations to the variance planes. Never use
+display-stretched pixels for flux measurement.
+
+## Validate
+
+```{r validate, eval=FALSE}
+stopifnot(length(dim(cube)) == 3L)
+stopifnot(dim(cube)[3] == length(bands))
+stopifnot(all(dim(var_cube) == dim(cube)))
+```
+
+The [Support Masks](support-mask-construction.html) guide begins once the cube,
+variance, wavelengths, WCS, and PSF target are explicit.

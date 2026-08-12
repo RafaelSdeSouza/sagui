@@ -1,0 +1,61 @@
+---
+title: "Paper Examples"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Paper Examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This page indexes the real examples already present in the repository. It does
+not imply that every upstream survey cutout can be redistributed or reproduced
+without its original data access and calibration context.
+
+## Sagui-10 {#sagui-10-main-example}
+
+```{r sagui10, echo=FALSE, out.width="100%", fig.cap="Sagui-10 photometric SED segmentation. Colours are categorical region labels."}
+path <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures", "sagui10_n20.png")
+knitr::include_graphics(path)
+```
+
+The site-ready image is `images/examples/sagui10_n20.png`. The regional SED fit
+shown below is retained as a verified repository asset; consult the provenance
+table before treating it as reproducible from public inputs alone.
+
+```{r sagui10-sed, echo=FALSE, out.width="100%", fig.cap="Regional SED fit retained with the Sagui-10 example."}
+path <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures", "sagui10_sedfit_region_1.png")
+knitr::include_graphics(path)
+```
+
+## Faint bridge {#sagui-11-faint-bridge}
+
+```{r bridge, echo=FALSE, out.width="100%", fig.cap="Sagui-11 low-surface-brightness composite and copula-pretransformed segmentation."}
+base <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures")
+knitr::include_graphics(c(file.path(base, "sagui11_lsb_composite.png"), file.path(base, "sagui11_lsb_copula.png")))
+```
+
+The copula transform is an analysis choice, not a neutral display transform.
+Compare it with an untransformed run before interpreting the bridge.
+
+## Target S/N {#target-sn-selection}
+
+```{r target-snr, echo=FALSE, out.width="100%", fig.cap="Sagui-10 candidate selected under a minimum regional S/N threshold of 10."}
+path <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures", "sagui10_target_snr_10.png")
+knitr::include_graphics(path)
+```
+
+The producer is `scripts/make_sagui10_target_snr_panel.R`; machine-readable
+candidate and selection tables live under
+`images/examples/target_snr/sagui10/`. The threshold must be read together with
+the variance model and candidate grid.
+
+## Bagpipes hand-off
+
+```{r bagpipes, echo=FALSE, out.width="100%", fig.cap="Bagpipes model photometry for Sagui-8 region 8, generated from a Sagui regional SED."}
+path <- file.path(dirname(knitr::current_input(dir = TRUE)), "..", "man", "figures", "sagui8_region8_bagpipes_sedfit.png")
+knitr::include_graphics(path)
+```
+
+The producer is `scripts/make_sagui8_bagpipes_sedfit_example.py`; its generated
+model photometry is in `outputs/website_sedfit/`. Bagpipes remains an optional
+downstream interface rather than part of Sagui's segmentation algorithm.

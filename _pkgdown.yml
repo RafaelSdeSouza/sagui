@@ -1,0 +1,146 @@
+url: https://rafaelsdesouza.com.br/sagui/
+destination: docs
+
+template:
+  bootstrap: 5
+  light-switch: true
+  bslib:
+    bg: "#ffffff"
+    fg: "#17233b"
+    primary: "#1d5f91"
+    secondary: "#ec6a5c"
+    link-color: "#155b8c"
+    border-radius: "0.2rem"
+    btn-border-radius: "0.2rem"
+  includes:
+    in_header: |
+      <meta name="theme-color" content="#173f66">
+
+home:
+  title: "Sagui | Photometric SED segmentation"
+  sidebar:
+    structure: [links, license, citation, authors, dev]
+
+navbar:
+  structure:
+    left: [get-started, user-guide, examples, reference, paper, github]
+    right: [search, lightswitch]
+  components:
+    get-started:
+      text: Get started
+      href: articles/getting-started.html
+    user-guide:
+      text: User guide
+      menu:
+        - text: Prepare photometry
+          href: articles/preparing-psf-matched-photometry.html
+        - text: Build a support mask
+          href: articles/support-mask-construction.html
+        - text: Segment photometric SEDs
+          href: articles/photometric-sed-segmentation.html
+        - text: Choose region count
+          href: articles/choosing-number-of-regions.html
+        - text: Export regional SEDs
+          href: articles/exporting-regional-seds.html
+        - text: Python and Astropy
+          href: articles/python-astropy-handoff.html
+    examples:
+      text: Examples
+      href: articles/paper-examples-reproduction.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    paper:
+      text: Paper
+      href: https://doi.org/10.1093/mnras/stag1062
+    github:
+      text: GitHub
+      href: https://github.com/RafaelSdeSouza/sagui
+
+articles:
+  - title: Start
+    contents:
+      - getting-started
+  - title: Prepare
+    contents:
+      - preparing-psf-matched-photometry
+      - support-mask-construction
+  - title: Segment
+    contents:
+      - photometric-sed-segmentation
+      - choosing-number-of-regions
+  - title: Use products
+    contents:
+      - exporting-regional-seds
+      - python-astropy-handoff
+  - title: Reproduce
+    contents:
+      - paper-examples-reproduction
+
+reference:
+  - title: Core segmentation
+    desc: Exact and sparse photometric SED segmentation, plus region-count selection.
+    contents:
+      - segment_regions
+      - segment_regions_large
+      - choose_ncomp_by_snr
+  - title: Photometry preparation
+    desc: Cube conversion, display transforms, masking, and spectrum transforms.
+    contents:
+      - cube_to_matrix
+      - collapse_white_light
+      - mask_cube
+      - pretransform_cube
+      - pretransform_spectra
+      - median_scale
+      - asinh_stretch
+  - title: Support construction
+    desc: Multiscale support builders and mask refinement.
+    contents:
+      - build_starlet_mask
+      - starlet_mask
+      - starlet_reconstruct
+      - b3_kernel
+      - upsample_kernel
+      - build_adaptive_support
+      - build_contourlet_mask
+      - clean_segmentation_mask
+      - threshold_starlet_regions
+  - title: Regional SED products
+    desc: Flux-preserving regional photometry and background summaries.
+    contents:
+      - RegionPhotometry
+      - extract_region_sed
+      - summarize_region_sed
+      - estimate_bkg_mad_per_lambda
+  - title: Maps and post-processing
+    desc: Categorical maps, region properties, relabelling, and smoothing.
+    contents:
+      - plot_region_map
+      - plot_region_property_map
+      - plot_region_property_raster
+      - reindex_regions
+      - fill_region_holes
+      - filter_regions_by_size
+      - reject_background_regions
+      - smooth_region_field_laplacian
+  - title: Clump candidates
+    desc: Optional candidate detection and diagnostic helpers.
+    contents:
+      - detect_sed_clumps
+      - segment_clumps
+      - segment_clump_profiles
+      - compute_clump_score
+      - clump_evidence_table
+      - grow_clump_footprints
+      - plot_clump_diagnostics
+  - title: Package
+    contents:
+      - sagui-package
+
+footer:
+  structure:
+    left: developed_by
+    right: built_with
+  components:
+    developed_by: "Part of the COIN Toolbox. Developed by Rafael S. de Souza and the COIN Collaboration."

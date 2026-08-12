@@ -8,6 +8,15 @@
 \description{
 Photometric analysis tools for spectral cubes.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://rafaelsdesouza.com.br/sagui/}
+  \item \url{https://github.com/RafaelSdeSouza/sagui}
+  \item Report bugs at \url{https://github.com/RafaelSdeSouza/sagui/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Rafael S. de Souza \email{rd23aag@herts.ac.uk}
 

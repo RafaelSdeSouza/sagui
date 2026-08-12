@@ -1,0 +1,30 @@
+citHeader("To cite sagui in publications, use:")
+
+bibentry(
+  bibtype = "Article",
+  title = "sagui: SED-based segmentation of multiband Galaxy images -- application to JADES in GOODS-South",
+  author = c(
+    person("Rafael S.", "de Souza"),
+    person("Andressa", "Wille"),
+    person("Shravya", "Shenoy"),
+    person("Aarya A.", "Patil"),
+    person("Alberto", "Krone-Martins"),
+    person("Ana L.", "Chies-Santos"),
+    person("Celine", "Boehm"),
+    person("Reinaldo R.", "Rosa"),
+    person("Thallis", "Pessi"),
+    person("Emille E. O.", "Ishida"),
+    person("Kristen C.", "Dage"),
+    person("Lilianne", "Nakazono"),
+    person("Phelipe", "Darc"),
+    person("Rupesh", "Durgesh")
+  ),
+  journal = "Monthly Notices of the Royal Astronomical Society",
+  year = "2026",
+  volume = "549",
+  number = "4",
+  pages = "stag1062",
+  doi = "10.1093/mnras/stag1062",
+  url = "https://doi.org/10.1093/mnras/stag1062",
+  note = "arXiv:2604.18812; for the COIN Collaboration"
+)

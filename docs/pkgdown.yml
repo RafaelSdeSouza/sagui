@@ -1,0 +1,16 @@
+pandoc: 3.6.3
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  choosing-number-of-regions: choosing-number-of-regions.html
+  exporting-regional-seds: exporting-regional-seds.html
+  getting-started: getting-started.html
+  paper-examples-reproduction: paper-examples-reproduction.html
+  photometric-sed-segmentation: photometric-sed-segmentation.html
+  preparing-psf-matched-photometry: preparing-psf-matched-photometry.html
+  python-astropy-handoff: python-astropy-handoff.html
+  support-mask-construction: support-mask-construction.html
+last_built: 2026-08-12T16:14Z
+urls:
+  reference: https://rafaelsdesouza.com.br/sagui/reference
+  article: https://rafaelsdesouza.com.br/sagui/articles
