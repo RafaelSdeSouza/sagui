@@ -43,8 +43,8 @@
     <li><a class="dropdown-item" href="../articles/python-astropy-handoff.html">Python and Astropy</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../articles/paper-examples-reproduction.html">Examples</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/paper-examples-reproduction.html">Bagpipes</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://doi.org/10.1093/mnras/stag1062">Paper</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/RafaelSdeSouza/sagui">GitHub</a></li>
       </ul>
@@ -103,20 +103,15 @@ signal-to-noise rule.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">selected</span><span class="op">$</span><span class="va">snr_grid</span></span></code></pre></div>
-<p>The variance cube and wavelength range define the meaning of the S/N
-threshold; preserve both with the result. A fallback error estimate is a
-quick diagnostic, not a replacement for calibrated uncertainty
-propagation.</p>
+<p>The S/N depends on the variance cube and wavelength range. A fallback
+error estimate is useful for inspection, but it does not replace
+calibrated uncertainties.</p>
 </div>
 <div class="section level2">
 <h2 id="stability">Stability<a class="anchor" aria-label="anchor" href="#stability"></a>
 </h2>
-<p>Inspect neighbouring candidate counts and check whether the
-structures used in the scientific interpretation persist. Record the
-accepted rule before examining downstream model fits where
-practical.</p>
-<p>The real Sagui-10 target-S/N products are listed in <a href="paper-examples-reproduction.html#target-sn-selection">Paper
-Examples</a>.</p>
+<p>Compare neighbouring candidate counts and check whether the
+structures of interest persist.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

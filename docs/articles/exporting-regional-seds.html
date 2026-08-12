@@ -43,8 +43,8 @@
     <li><a class="dropdown-item" href="../articles/python-astropy-handoff.html">Python and Astropy</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../articles/paper-examples-reproduction.html">Examples</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/paper-examples-reproduction.html">Bagpipes</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://doi.org/10.1093/mnras/stag1062">Paper</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/RafaelSdeSouza/sagui">GitHub</a></li>
       </ul>
@@ -82,9 +82,8 @@
 
     
     
-<p>Measure regional SEDs on the flux cube intended for science, using
-the categorical label map learned from the segmentation
-representation.</p>
+<p>Measure regional SEDs from the calibrated flux cube, using the
+segmentation map to group pixels.</p>
 <div class="section level2">
 <h2 id="extract">Extract<a class="anchor" aria-label="anchor" href="#extract"></a>
 </h2>
@@ -106,16 +105,14 @@ follows the propagated regional variance.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">regional</span><span class="op">$</span><span class="va">flux_long</span>, <span class="st">"regional_seds_long.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">regional</span><span class="op">$</span><span class="va">flux_wide</span>, <span class="st">"regional_seds_wide.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>Store a provenance record beside the tables: input cube, variance
-cube, band axis, PSF target, support settings, segmentation settings,
-random seed where applicable, package version, and output paths.</p>
+<p>Save the band axis, PSF target, support mask, and segmentation
+parameters with the tables.</p>
 </div>
 <div class="section level2">
 <h2 id="keep-labels-intact">Keep labels intact<a class="anchor" aria-label="anchor" href="#keep-labels-intact"></a>
 </h2>
 <p>Do not renumber labels between the map and the table unless the
-mapping is also written. Region identifiers are join keys, not
-measurements.</p>
+mapping is also saved. The label numbers only identify regions.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
