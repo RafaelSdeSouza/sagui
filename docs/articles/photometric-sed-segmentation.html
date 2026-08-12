@@ -43,8 +43,8 @@
     <li><a class="dropdown-item" href="../articles/python-astropy-handoff.html">Python and Astropy</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../articles/paper-examples-reproduction.html">Examples</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/paper-examples-reproduction.html">Bagpipes</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://doi.org/10.1093/mnras/stag1062">Paper</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/RafaelSdeSouza/sagui">GitHub</a></li>
       </ul>
@@ -82,9 +82,9 @@
 
     
     
-<p>Sagui clusters one photometric SED per supported pixel. Support
-construction, clustering transforms, and flux measurement remain
-separate.</p>
+<p>Sagui clusters one photometric SED per supported pixel. The support
+mask and clustering transform are chosen before measuring the regional
+fluxes.</p>
 <div class="section level2">
 <h2 id="exact-ward">Exact Ward<a class="anchor" aria-label="anchor" href="#exact-ward"></a>
 </h2>
@@ -111,8 +111,8 @@ the supported pixel count fits available memory.</p>
 <span>  auto_k <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The sparse backend restricts candidate merges to a nearest-neighbour
-graph. Record <code>knn_k</code>, <code>auto_k</code>, the support, and
-every transform alongside the result.</p>
+graph. Its result depends on <code>knn_k</code>, <code>auto_k</code>,
+the support mask, and the transform.</p>
 </div>
 <div class="section level2">
 <h2 id="choose-transforms">Choose transforms<a class="anchor" aria-label="anchor" href="#choose-transforms"></a>
@@ -120,11 +120,10 @@ every transform alongside the result.</p>
 <p>Use <code>cluster_pretransform</code>, not the deprecated
 <code>pretransform</code> alias. The default <code>"none"</code>
 preserves the input representation. Alternatives such as
-<code>"copula_gaussian"</code> change the clustering geometry and should
-be justified and tested as analysis choices.</p>
-<p>Region labels are categorical. Never map their integer values to an
-ordered colour scale or interpret a larger label as a larger physical
-quantity.</p>
+<code>"copula_gaussian"</code> change the clustering geometry; compare
+them against <code>"none"</code>.</p>
+<p>Region labels are categorical. Their integer values do not represent
+a physical ordering.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

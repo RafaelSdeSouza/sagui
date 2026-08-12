@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Getting Started • sagui</title>
+<title>Get Started • sagui</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
-<meta property="og:title" content="Getting Started">
+<meta property="og:title" content="Get Started">
 <meta name="theme-color" content="#173f66">
 </head>
 <body>
@@ -43,8 +43,8 @@
     <li><a class="dropdown-item" href="../articles/python-astropy-handoff.html">Python and Astropy</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../articles/paper-examples-reproduction.html">Examples</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/paper-examples-reproduction.html">Bagpipes</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://doi.org/10.1093/mnras/stag1062">Paper</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/RafaelSdeSouza/sagui">GitHub</a></li>
       </ul>
@@ -73,7 +73,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Getting Started</h1>
+      <h1>Get Started</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/RafaelSdeSouza/sagui/blob/HEAD/vignettes/getting-started.Rmd" class="external-link"><code>vignettes/getting-started.Rmd</code></a></small>
@@ -82,10 +82,8 @@
 
     
     
-<p>Sagui separates four operations: prepare a common multiband cube,
-construct a spatial support, assign categorical regions, and measure
-regional SEDs. Keeping those operations explicit makes the result easier
-to reproduce.</p>
+<p>Sagui prepares a common multiband cube, constructs a spatial support,
+assigns categorical regions, and measures their integrated SEDs.</p>
 <div class="section level2">
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
@@ -97,9 +95,8 @@ to reproduce.</p>
 <div class="section level2">
 <h2 id="simulate-a-galaxy">Simulate a galaxy<a class="anchor" aria-label="anchor" href="#simulate-a-galaxy"></a>
 </h2>
-<p>This fixed-seed example mixes bulge, disc, and two knot profiles in
-nine bands. It is an API demonstration, not an observation or a physical
-inference.</p>
+<p>This fixed-seed simulation mixes bulge, disc, and two knot profiles
+in nine bands.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.90</span>, <span class="fl">1.15</span>, <span class="fl">1.50</span>, <span class="fl">1.82</span>, <span class="fl">2.00</span>, <span class="fl">2.77</span>, <span class="fl">3.56</span>, <span class="fl">4.10</span>, <span class="fl">4.44</span><span class="op">)</span></span>
@@ -132,9 +129,8 @@ inference.</p>
 <div class="section level2">
 <h2 id="segment">Segment<a class="anchor" aria-label="anchor" href="#segment"></a>
 </h2>
-<p><code>use_starlet_mask = FALSE</code> is deliberate here because the
-simulated support is already encoded by missing values outside the
-galaxy.</p>
+<p>The simulated galaxy already uses <code>NA</code> outside its
+support, so no starlet mask is needed.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">seg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/segment_regions.html">segment_regions</a></span><span class="op">(</span></span>
 <span>  <span class="va">cube</span>,</span>
@@ -228,14 +224,14 @@ no physical meaning; <code>NA</code> denotes unassigned background.</p>
 </tbody>
 </table>
 <div class="figure">
-<img src="../../../../../../private/var/folders/y_/27y51wnx0cz5lf2hsksp1gdc0000gr/T/RtmpfpDjQ8/temp_libpath1358932f7d7eb/sagui/help/figures/sagui-first-run-synthetic-sed.png" class="r-plt" alt="Six categorical regions and their fixed-seed nine-band regional SEDs. Curves are normalised at 2 µm only for shape comparison." width="100%"><p class="caption">
+<img src="../reference/figures/sagui-first-run-synthetic-sed.png" class="r-plt" alt="Six categorical regions and their fixed-seed nine-band regional SEDs. Curves are normalised at 2 µm only for shape comparison." width="100%"><p class="caption">
 Six categorical regions and their fixed-seed nine-band regional SEDs.
 Curves are normalised at 2 µm only for shape comparison.
 </p>
 </div>
 <p>Continue with <a href="preparing-psf-matched-photometry.html">Prepare
-Photometry</a> for observations, or <a href="exporting-regional-seds.html">Export Regional SEDs</a> for the
-downstream data contract.</p>
+Photometry</a> for observations, or <a href="exporting-regional-seds.html">Export Regional SEDs</a> to save the
+results.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
